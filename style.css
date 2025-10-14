@@ -12,19 +12,19 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* === FULL-WIDTH, LOCKED 3:2 CANVAS (no cropping) === */
-.hero{ width:100vw; height:100vh; background:#000; }
-.frame{
-  position:relative;
-  width:100vw;                 /* fill width */
-  aspect-ratio:3 / 2;          /* 1152x768 */
-  height:auto;
-  max-height:100vh;            /* constrain height */
-  margin:0 auto;
-  background:#000;             /* letterbox bars blend to black */
+/* Full-viewport stage */
+.hero{
+  position:fixed; inset:0; margin:0;
+  background:#000; overflow:hidden;
 }
 
-/* Image fills the frame exactly (no crop because frame is 3:2 too) */
+/* The 3:2 canvas – sized by JS to ALWAYS COVER the viewport */
+.frame{
+  position:absolute; /* JS sets width/height/left/top */
+  background:#000;
+}
+
+/* Image fills the frame exactly (no crop; the frame is 3:2) */
 #station{
   position:absolute; inset:0;
   width:100%; height:100%;
@@ -112,7 +112,7 @@ body{
   #station,.dark-overlay{ transition:none; }
 }
 
-/* Small screens: wider buttons & smaller modal */
+/* Small screens */
 @media (max-width:640px){
   .modal-card{ min-width:92vw; }
   .links-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
