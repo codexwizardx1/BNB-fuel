@@ -1,18 +1,18 @@
 const lightsOn = document.getElementById('lights');
 
 function burstFlicker() {
-  // do a quick burst of flickers
+  // number of quick flickers in one burst
   const burstCount = Math.floor(Math.random() * 3) + 1;
   let i = 0;
 
   const burst = setInterval(() => {
-    lightsOn.style.opacity = (Math.random() > 0.5) ? 0 : 1;
+    lightsOn.style.opacity = Math.random() > 0.5 ? 0 : 1;
     i++;
     if (i >= burstCount) clearInterval(burst);
-  }, 80); // speed of each mini flicker in burst
+  }, 70); // SPEED of each mini flicker (lower = faster)
 
-  // schedule next burst
-  const nextBurst = 200 + Math.random() * 600;
+  // time between bursts
+  const nextBurst = 100 + Math.random() * 400;
   setTimeout(burstFlicker, nextBurst);
 }
 
