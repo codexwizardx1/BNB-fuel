@@ -9,19 +9,18 @@
 <body>
   <div class="hero">
     <div class="frame">
-      <!-- ONE IMAGE (lights-on). We simulate "off" via filters/overlay -->
+      <!-- One image only; "lights off" is simulated with filters/overlay -->
       <img id="station" src="station_on.png" alt="BNB Fuel Station" />
       <div class="dark-overlay"></div>
 
-      <!-- HOTSPOTS (click areas) -->
+      <!-- Clickable hotspots over the pump plates -->
       <button class="hotspot hs-tokenomics" aria-label="Show tokenomics"></button>
       <button class="hotspot hs-contract"   aria-label="Show contract address"></button>
       <button class="hotspot hs-links"      aria-label="Show links"></button>
     </div>
   </div>
 
-  <!-- MODALS -->
-  <!-- CONTRACT -->
+  <!-- CONTRACT MODAL -->
   <div class="modal" id="modal-contract" aria-hidden="true">
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contract-title">
@@ -31,22 +30,22 @@
         <button id="copyContract">Copy</button>
         <button data-close>Close</button>
       </div>
-      <p class="modal-hint">Edit the address in <code>script.js</code>.</p>
+      <p class="modal-hint">Set your real address in <code>script.js</code>.</p>
     </div>
   </div>
 
-  <!-- LINKS -->
+  <!-- LINKS MODAL -->
   <div class="modal" id="modal-links" aria-hidden="true">
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="links-title">
       <h2 id="links-title">Official Links</h2>
       <div class="links-grid">
-        <a id="lnk-buy"       class="link-btn" target="_blank" rel="noopener">Buy</a>
-        <a id="lnk-chart"     class="link-btn" target="_blank" rel="noopener">Chart</a>
-        <a id="lnk-dextools"  class="link-btn" target="_blank" rel="noopener">DEXTools</a>
-        <a id="lnk-telegram"  class="link-btn" target="_blank" rel="noopener">Telegram</a>
-        <a id="lnk-twitter"   class="link-btn" target="_blank" rel="noopener">X / Twitter</a>
-        <a id="lnk-whitepaper"class="link-btn" target="_blank" rel="noopener">Whitepaper</a>
+        <a id="lnk-buy"        class="link-btn" target="_blank" rel="noopener">Buy</a>
+        <a id="lnk-chart"      class="link-btn" target="_blank" rel="noopener">Chart</a>
+        <a id="lnk-dextools"   class="link-btn" target="_blank" rel="noopener">DEXTools</a>
+        <a id="lnk-telegram"   class="link-btn" target="_blank" rel="noopener">Telegram</a>
+        <a id="lnk-twitter"    class="link-btn" target="_blank" rel="noopener">X / Twitter</a>
+        <a id="lnk-whitepaper" class="link-btn" target="_blank" rel="noopener">Whitepaper</a>
       </div>
       <div class="modal-actions">
         <button data-close>Close</button>
@@ -55,7 +54,7 @@
     </div>
   </div>
 
-  <!-- TOKENOMICS -->
+  <!-- TOKENOMICS MODAL -->
   <div class="modal" id="modal-tokenomics" aria-hidden="true">
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="toks-title">
@@ -71,7 +70,7 @@
       <div class="modal-actions">
         <button data-close>Close</button>
       </div>
-      <p class="modal-hint">You can edit these values in <code>script.js</code> or directly here.</p>
+      <p class="modal-hint">Change values in <code>script.js</code>.</p>
     </div>
   </div>
 
