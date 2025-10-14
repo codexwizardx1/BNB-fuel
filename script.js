@@ -41,30 +41,50 @@ const HS = {
  * COVER LAYOUT (no black edges) + hotspot placement synced to cover math
  *****************/
 function layoutCover(){
+  // Use visual viewport height on mobile so sizing is accurate
   const vw = window.innerWidth;
   const vh = (window.visualViewport && window.visualViewport.height)
              ? Math.floor(window.visualViewport.height)
              : window.innerHeight;
 
-  const iw = stationImg.naturalWidth  || 1152;
+  const iw = stationImg.naturalWidth  || 1152; // your art
   const ih = stationImg.naturalHeight || 768;
 
-  // CSS cover math
-  const scale = Math.max(vw/iw, vh/ih);
-  const dispW = Math.ceil(iw * scale);
-  const dispH = Math.ceil(ih * scale);
-  const offX  = Math.floor((vw - dispW) / 2);
-  const offY  = Math.floor((vh - dispH) / 2);
+  // Decide mode:
+  // - "contain" on narrow/tall screens so the whole image is visible
+  // - "cover" otherwise, to fill without bars
+  const aspect   = vw / vh;
+  const imgRatio = iw / ih; // 3/2
+  const useContain = (vw < 768) || (vh > vw * 1.25); // small or quite tall viewport
 
-  // Position stage to where the image draws
+  let scale, dispW, dispH, offX, offY;
+
+  if (useContain) {
+    // FIT the whole image (may show black bars, but you see everything)
+    scale = Math.min(vw/iw, vh/ih);
+    dispW = Math.round(iw * scale);
+    dispH = Math.round(ih * scale);
+    offX  = Math.floor((vw - dispW) / 2);
+    offY  = Math.floor((vh - dispH) / 2);
+  } else {
+    // FILL the screen (no bars, but image can crop)
+    scale = Math.max(vw/iw, vh/ih);
+    dispW = Math.round(iw * scale);
+    dispH = Math.round(ih * scale);
+    offX  = Math.floor((vw - dispW) / 2);
+    offY  = Math.floor((vh - dispH) / 2);
+  }
+
+  // Position the stage to exactly where the image is drawn
   stage.style.left   = offX + 'px';
   stage.style.top    = offY + 'px';
   stage.style.width  = dispW + 'px';
   stage.style.height = dispH + 'px';
 
-  // Position hotspots in pixels
+  // Place hotspots (fractions → pixels within displayed image)
   Object.values(HS).forEach(spec => placeHotspot(spec, dispW, dispH));
 }
+
 
 function placeHotspot(spec, dispW, dispH){
   const el = spec.el;
