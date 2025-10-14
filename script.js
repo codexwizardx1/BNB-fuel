@@ -116,6 +116,7 @@ function place(spec, dispW, dispH){
   el.style.height = h + 'px';
   el.style.transform = `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`;
 }
+document.addEventListener('DOMContentLoaded', layout);
 
 // run & keep updated
 if (stationImg.complete) layout(); else stationImg.addEventListener('load', layout);
