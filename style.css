@@ -26,10 +26,10 @@ body{
 }
 
 /* Stage is where we size/draw the visible image */
-.stage{ position:absolute; z-index:1; }
+.stage{ position:absolute; z-index:2; }
 
 /* Ensure <picture> never covers hotspots */
-#stationPicture{ position:absolute; inset:0; z-index:0 }
+#stationPicture{ position:absolute; inset:0; z-index:0; pointer-events:none; }
 
 /* Image sits under hotspots and doesn't eat clicks */
 #station{
@@ -37,7 +37,7 @@ body{
   width:100%; height:100%;
   object-fit: fill;      /* stage handles sizing */
   transition: filter 80ms linear;
-  pointer-events: none;  /* important: don't block clicks */
+  pointer-events: none;
   z-index:0;
 }
 
@@ -55,12 +55,12 @@ body{
 
 /* Hotspots on top */
 .hotspot{
-  position:absolute; z-index:3;
+  position:absolute; z-index:9999; pointer-events:auto;
   background:transparent; border:0; padding:0; margin:0; cursor:pointer;
 }
 
 /* Modals */
-.modal{ position:fixed; inset:0; z-index:10; display:none; }
+.modal{ position:fixed; inset:0; z-index:10000; display:none; }
 .modal[aria-hidden="false"]{ display:block; }
 .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(2px); }
 .modal-card{
@@ -100,12 +100,3 @@ body{
 .hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
-/* Ensure the image wrapper never intercepts clicks on desktop */
-#stationPicture { position:absolute; inset:0; z-index:0; pointer-events:none; }
-
-/* Image also never catches clicks */
-#station { pointer-events:none; z-index:0; }
-
-/* Keep hotspots definitely above everything */
-.hotspot { position:absolute; z-index:5; display:block; }
-.dark-overlay { z-index:1; }  /* already pointer-events:none */
