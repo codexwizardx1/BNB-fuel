@@ -7,16 +7,16 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="hero">
-    <div class="frame" id="frame">
-      <!-- One image only; "lights off" is simulated via filters/overlay -->
+  <div id="root">
+    <!-- Stage is the area where the image actually draws after cover-scaling -->
+    <div class="stage" id="stage">
       <img id="station" src="station_on.png" alt="BNB Fuel Station" />
-      <div class="dark-overlay"></div>
+      <div class="dark-overlay" id="overlay"></div>
 
-      <!-- Clickable hotspots over the pump plates -->
-      <button class="hotspot hs-tokenomics" aria-label="Show tokenomics"></button>
-      <button class="hotspot hs-contract"   aria-label="Show contract address"></button>
-      <button class="hotspot hs-links"      aria-label="Show links"></button>
+      <!-- Hotspots are positioned in JS based on cover math -->
+      <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
+      <button class="hotspot" id="hs-contract"   aria-label="Show contract address"></button>
+      <button class="hotspot" id="hs-links"      aria-label="Show links"></button>
     </div>
   </div>
 
