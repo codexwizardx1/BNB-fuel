@@ -3,7 +3,6 @@
   --off-brightness:0.18;
   --off-saturation:0.35;
   --off-contrast:0.95;
-  /* JS updates this so the blurred bg matches the active image */
   --bg-url: url("station_on.png");
 }
 
@@ -14,7 +13,7 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* Root covers full viewport; blurred background fill to avoid bars */
+/* Full viewport container + blurred bg fill */
 #root{
   position:fixed; inset:0; overflow:hidden;
 }
@@ -23,61 +22,81 @@ body{
   position:fixed; inset:0; z-index:0;
   background: var(--bg-url) center / cover no-repeat;
   filter: blur(24px) brightness(0.55) saturate(1.08);
-  transform: scale(1.12); /* hide blur seam at edges */
+  transform: scale(1.12);
 }
 
-/* Stage is positioned/sized by JS (contain math) above the blur */
-.stage{
-  position:absolute; z-index:1; /* JS sets left/top/width/height */
-}
+/* Stage is where we size/draw the visible image */
+.stage{ position:absolute; z-index:1; }
 
-/* picture/img takes full stage; we draw sizing on the stage itself */
+/* Ensure <picture> never covers hotspots */
+#stationPicture{ position:absolute; inset:0; z-index:0 }
+
+/* Image sits under hotspots and doesn't eat clicks */
 #station{
   position:absolute; inset:0;
   width:100%; height:100%;
-  object-fit: fill;           /* stage already sized to the displayed image */
+  object-fit: fill;      /* stage handles sizing */
   transition: filter 80ms linear;
+  pointer-events: none;  /* important: don't block clicks */
   z-index:0;
+}
+
+/* Flicker overlay (under hotspots, over img) */
+.dark-overlay{
+  position:absolute; inset:0;
+  background:#000; mix-blend-mode:multiply; opacity:0;
+  transition:opacity 80ms linear; pointer-events:none;
+  z-index:1;
 }
 #station.off{
   filter:brightness(var(--off-brightness)) saturate(var(--off-saturation)) contrast(var(--off-contrast));
 }
-.dark-overlay{
-  position:absolute; inset:0; z-index:1;
-  background:#000; mix-blend-mode:multiply; opacity:0;
-  transition:opacity 80ms linear; pointer-events:none;
-}
 .dark-overlay.off{ opacity:0.35; }
 
-/* Hotspots are placed in pixels by JS */
+/* Hotspots on top */
 .hotspot{
-  position:absolute; z-index:3; background:transparent;
-  border:0; padding:0; margin:0; cursor:pointer;
+  position:absolute; z-index:3;
+  background:transparent; border:0; padding:0; margin:0; cursor:pointer;
 }
 
-/* MODALS */
+/* Modals */
 .modal{ position:fixed; inset:0; z-index:10; display:none; }
 .modal[aria-hidden="false"]{ display:block; }
-.modal-backdrop{
-  position:absolute; inset:0; background:rgba(0,0,0,.6);
-  backdrop-filter: blur(2px);
-}
+.modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(2px); }
 .modal-card{
-  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  background:#0b0b0b; border:1px solid #222; border-radius:12px;
-  min-width:min(92vw,580px); padding:22px;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
+  background:#0b0b0b; border:1px solid #222; border-radius:12px; color:#fff;
+  min-width:min(92vw,580px); padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.6);
 }
 .modal-card h2{ margin:0 0 10px; font-size:18px; color:var(--bnb-yellow); }
 .modal-card code{
-  display:block; background:#111; border:1px solid #1f1f1f;
-  padding:10px; border-radius:8px; font-size:14px; word-break:break-all;
+  display:block; background:#111; border:1px solid #1f1f1f; padding:10px; border-radius:8px; font-size:14px; word-break:break-all;
 }
-.modal-actions{ displa
-/* Make the picture wrapper behave like the img and never cover buttons */
-#stationPicture{ position:absolute; inset:0; z-index:0 }
+.modal-actions{ display:flex; gap:10px; margin-top:14px; }
+.modal-actions button{
+  background:var(--bnb-yellow); color:#000; border:0; border-radius:10px; padding:10px 14px; font-weight:800; letter-spacing:.04em; cursor:pointer;
+}
+.modal-actions button[data-close]{ background:#1c1c1c; color:#eee; border:1px solid #2a2a2a; }
 
-/* Ensure the image never steals clicks; buttons are above it */
-#station{ pointer-events:none; z-index:0 }
-.hotspot{ z-index:3 }
-.dark-overlay{ z-index:1 }
+/* Links grid */
+.links-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:6px; }
+.link-btn{ display:block; text-align:center; text-decoration:none; border-radius:10px; padding:12px 10px; background:var(--bnb-yellow); color:#000; font-weight:800; letter-spacing:.04em; }
+
+/* Tokenomics table */
+.tok-table{ width:100%; border-collapse:separate; border-spacing:0 8px; margin-top:6px; }
+.tok-table th,.tok-table td{ padding:10px; border:1px solid #1f1f1f; background:#111; }
+.tok-table th{ color:#ddd; text-align:left; width:38%; }
+.tok-table td{ color:#fff; }
+
+/* Mobile viewport handling */
+@supports (height: 100dvh) { #root { height: 100dvh; } }
+#root { height: 100vh; }
+
+@media (max-width: 640px){
+  .modal-card{ max-height: 90dvh; overflow:auto; padding-bottom: calc(22px + env(safe-area-inset-bottom, 0)); }
+}
+
+/* Focus rings */
+.hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
+  outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
+}
