@@ -90,5 +90,21 @@
   <button id="align-toggle" type="button" title="Toggle Alignment (A)">Align</button>
 
   <script src="script.js"></script>
+  <script>
+(function(){
+  function toggleAlign(){
+    document.body.classList.toggle('debug');
+    const btn = document.getElementById('align-toggle');
+    if (btn) btn.setAttribute('aria-pressed', String(document.body.classList.contains('debug')));
+  }
+  // Button click
+  document.getElementById('align-toggle')?.addEventListener('click', toggleAlign, {capture:true});
+  // Keyboard (A)
+  window.addEventListener('keydown', function(e){
+    if (e.key === 'a' || e.key === 'A') { e.preventDefault(); toggleAlign(); }
+  }, true);
+})();
+</script>
+
 </body>
 </html>
