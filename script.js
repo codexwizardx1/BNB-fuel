@@ -1,7 +1,7 @@
 /*****************
  * CONFIG
  *****************/
-const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // <-- replace with real
+const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // <-- put your real address
 const LINKS = {
   BUY:        "https://example.com/buy",
   CHART:      "https://example.com/chart",
@@ -15,6 +15,41 @@ const TOKENOMICS = {
   tax: "0%",
   liquidity: "Locked",
 };
+
+// Image ratio (your artwork is 1152x768 = 3:2)
+const IMAGE_RATIO = 3/2;
+
+/*****************
+ * COVER-SIZE THE 3:2 FRAME (no black edges, hotspots aligned)
+ *****************/
+(function(){
+  const frame = document.getElementById('frame');
+
+  function sizeFrame(){
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const viewRatio = vw / vh;
+
+    let w, h;
+    if (viewRatio > IMAGE_RATIO) {
+      // viewport is wider than 3:2: use full height, expand width
+      h = vh;
+      w = Math.ceil(h * IMAGE_RATIO);
+    } else {
+      // viewport is taller/narrower: use full width, expand height
+      w = vw;
+      h = Math.ceil(w / IMAGE_RATIO);
+    }
+    // center the frame
+    frame.style.width  = w + 'px';
+    frame.style.height = h + 'px';
+    frame.style.left   = ((vw - w) / 2) + 'px';
+    frame.style.top    = ((vh - h) / 2) + 'px';
+  }
+
+  window.addEventListener('resize', sizeFrame);
+  sizeFrame();
+})();
 
 /*****************
  * FAST FLICKER (single-image method)
@@ -50,7 +85,7 @@ function startFlicker(){
       const next = 100 + Math.random()*300; // quick cycle
       flickerTimer = setTimeout(startFlicker, next);
     }
-  }, 60); // faster (40–80ms feels snappy)
+  }, 60); // 40–80ms feels snappy
 }
 
 // kick it off & keep it alive
@@ -92,11 +127,10 @@ document.getElementById('tok-liq').textContent = TOKENOMICS.liquidity;
 document.getElementById('tok-addr').textContent = CONTRACT_ADDRESS;
 
 // Open/close wiring
-const openContract  = () => mContract.setAttribute('aria-hidden','false');
-const openLinks     = () => mLinks.setAttribute('aria-hidden','false');
-const openTokenomics= () => mTok.setAttribute('aria-hidden','false');
-
-const closeModal = (m) => m.setAttribute('aria-hidden','true');
+const openContract   = () => mContract.setAttribute('aria-hidden','false');
+const openLinks      = () => mLinks.setAttribute('aria-hidden','false');
+const openTokenomics = () => mTok.setAttribute('aria-hidden','false');
+const closeModal     = (m) => m.setAttribute('aria-hidden','true');
 
 document.querySelector('.hs-contract')  .addEventListener('click', openContract);
 document.querySelector('.hs-links')     .addEventListener('click', openLinks);
