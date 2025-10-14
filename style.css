@@ -74,3 +74,10 @@ body{
   padding:10px; border-radius:8px; font-size:14px; word-break:break-all;
 }
 .modal-actions{ displa
+/* Make the picture wrapper behave like the img and never cover buttons */
+#stationPicture{ position:absolute; inset:0; z-index:0 }
+
+/* Ensure the image never steals clicks; buttons are above it */
+#station{ pointer-events:none; z-index:0 }
+.hotspot{ z-index:3 }
+.dark-overlay{ z-index:1 }
