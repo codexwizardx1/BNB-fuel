@@ -1,16 +1,19 @@
 const lightsOn = document.getElementById('lights');
 
-function flicker() {
-  // Random chance for the light to turn off
-  if (Math.random() > 0.8) {
-    lightsOn.style.opacity = 0; // off
-  } else {
-    lightsOn.style.opacity = 1; // on
-  }
+function burstFlicker() {
+  // do a quick burst of flickers
+  const burstCount = Math.floor(Math.random() * 3) + 1;
+  let i = 0;
 
-  // Random interval between flickers
-  const nextFlicker = 200 + Math.random() * 800;
-  setTimeout(flicker, nextFlicker);
+  const burst = setInterval(() => {
+    lightsOn.style.opacity = (Math.random() > 0.5) ? 0 : 1;
+    i++;
+    if (i >= burstCount) clearInterval(burst);
+  }, 80); // speed of each mini flicker in burst
+
+  // schedule next burst
+  const nextBurst = 200 + Math.random() * 600;
+  setTimeout(burstFlicker, nextBurst);
 }
 
-flicker();
+burstFlicker();
