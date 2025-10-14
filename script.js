@@ -25,7 +25,7 @@ setBg(stationImg.currentSrc || stationImg.src);
 stationImg.addEventListener('load', ()=>{ setBg(stationImg.currentSrc || stationImg.src); layout(); });
 
 /*****************
- * DESKTOP HOTSPOT FRACTIONS (your aligned values)
+ * DESKTOP HOTSPOT FRACTIONS (aligned on desktop)
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7,  rot: -7   },
@@ -42,12 +42,12 @@ function usingPortraitImage(){
          /station_mobile_1080x1920/i.test(src);
 }
 
-/* Mobile zoom – bump if you want tighter */
+/* Mobile zoom */
 const MOBILE_ZOOM = 1.22;
 
 /*****************
  * LAYOUT
- * - Desktop (3:2) = COVER (exactly like your perfect version)
+ * - Desktop (3:2) = COVER (edge-to-edge, your coords)
  * - Portrait mobile (9:16) = CONTAIN + zoom, with hotspot remap
  *****************/
 let HS = null;
@@ -60,7 +60,7 @@ function layout(){
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // PORTRAIT IMAGE
+    // PORTRAIT IMAGE (mobile)
     const contain = Math.min(vw/iw, vh/ih);
     const cover   = Math.max(vw/iw, vh/ih);
     const scale   = Math.min(contain * MOBILE_ZOOM, cover);
@@ -86,7 +86,7 @@ function layout(){
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
 
   } else {
-    // DESKTOP / LANDSCAPE IMAGE — COVER (original math)
+    // DESKTOP / LANDSCAPE IMAGE — COVER
     const scale = Math.max(vw/iw, vh/ih);
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
@@ -217,9 +217,9 @@ document.addEventListener('keydown', (e)=>{
 });
 
 /*****************
- * ===== ALIGNMENT MODE =====
- * Toggle: A
- * Target: Tab cycles (tokenomics → contract → links)
+ * ===== ALIGNMENT MODE v2 =====
+ * Toggle: Button (top-right), Key "A", or URL (#align or ?align=1)
+ * Target cycle: Tab (tokenomics → contract → links)
  * Nudge:  arrows       (x/y)
  * Resize: Shift+arrows (w/h)
  * Skew:   [ / ]
@@ -233,23 +233,26 @@ document.addEventListener('keydown', (e)=>{
 
   const hud = document.getElementById('align-hud');
   const hudName = document.getElementById('hud-name');
+  const btn = document.getElementById('align-toggle');
 
   function currentKey(){ return order[idx]; }
   function current(){ return HS_LANDSCAPE[currentKey()]; }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
   function updateHUD(){
-    if(!DEBUG) return;
+    if(!hud) return;
     hudName.textContent = currentKey();
+    btn?.setAttribute('aria-pressed', String(DEBUG));
   }
 
   function applyAndRefresh(){
-    layout(); // desktop cover layout; remap only happens on portrait image
+    if (usingPortraitImage && usingPortraitImage()) return; // align only on desktop image
+    layout();
     updateHUD();
   }
 
-  function toggleDebug(){
-    DEBUG = !DEBUG;
+  function toggleDebug(force){
+    DEBUG = typeof force === 'boolean' ? force : !DEBUG;
     document.body.classList.toggle('debug', DEBUG);
     updateHUD();
   }
@@ -271,8 +274,6 @@ document.addEventListener('keydown', (e)=>{
 
   function nudge(e){
     if(!DEBUG) return;
-
-    // Align on desktop only; if portrait image is loaded, ignore nudges
     if (usingPortraitImage && usingPortraitImage()) return;
 
     const v = current();
@@ -294,7 +295,7 @@ document.addEventListener('keydown', (e)=>{
     if(handled){ e.preventDefault(); applyAndRefresh(); }
   }
 
-  document.addEventListener('keydown', (e)=>{
+  function keyHandler(e){
     if(e.key==='a' || e.key==='A'){ toggleDebug(); return; }
     if(!DEBUG) return;
 
@@ -305,18 +306,29 @@ document.addEventListener('keydown', (e)=>{
       return;
     }
     if(e.key==='c' || e.key==='C'){ e.preventDefault(); copyJSON(); return; }
-
     nudge(e);
-  }, true);
+  }
+  window.addEventListener('keydown', keyHandler, true);
+  document.addEventListener('keydown', keyHandler, true);
+
+  // Button toggle
+  btn?.addEventListener('click', ()=>toggleDebug(), {capture:true});
+
+  // URL toggles: #align or ?align=1
+  function autoEnableFromURL(){
+    const hash = (location.hash||'').toLowerCase();
+    const params = new URLSearchParams(location.search);
+    if(hash.includes('align') || params.get('align')==='1'){ toggleDebug(true); }
+  }
+  document.addEventListener('DOMContentLoaded', autoEnableFromURL);
+  autoEnableFromURL();
 
   // Click a hotspot to select it in debug
   ['hs-tokenomics','hs-contract','hs-links'].forEach((id, i)=>{
     const el = document.getElementById(id);
     if(!el) return;
     el.addEventListener('pointerdown', ()=>{
-      if(DEBUG){ idx = i; updateHUD(); }
+      if(document.body.classList.contains('debug')){ idx = i; updateHUD(); }
     }, true);
   });
-
-  // Start with debug OFF; press "A" to toggle
 })();
