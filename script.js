@@ -30,10 +30,35 @@ const hsLinks      = document.getElementById('hs-links');
 /* Fractions (0..1) relative to ORIGINAL image.
    Start values; we’ll fine-tune live in Alignment Mode. */
 const HS = {
-  tokenomics: { el: hsTokenomics, x: 0.3200, y: 0.6300, w: 0.1100, h: 0.0360, skew: -7, rot: -1, label: "TOKENOMICS" },
-  contract:   { el: hsContract,   x: 0.5550, y: 0.6320, w: 0.1020, h: 0.0340, skew: -4, rot: -1, label: "CONTRACT"   },
-  links:      { el: hsLinks,      x: 0.6820, y: 0.6410, w: 0.0960, h: 0.0330, skew: -5, rot: -1, label: "LINKS"      },
+  tokenomics: {
+    el: document.getElementById('hs-tokenomics'),
+    x: 0.2,
+    y: 0.647,
+    w: 0.096,
+    h: 0.036,
+    skew: -7,
+    rot: -7
+  },
+  contract: {
+    el: document.getElementById('hs-contract'),
+    x: 0.481,
+    y: 0.645,
+    w: 0.102,
+    h: 0.034,
+    skew: -4,
+    rot: 5.2
+  },
+  links: {
+    el: document.getElementById('hs-links'),
+    x: 0.661,
+    y: 0.671,
+    w: 0.048,
+    h: 0.029,
+    skew: -5,
+    rot: 2.2
+  }
 };
+
 
 function layoutCover(){
   const vw = window.innerWidth;
