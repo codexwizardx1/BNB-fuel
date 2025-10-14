@@ -42,13 +42,13 @@ function usingPortraitImage(){
          /station_mobile_1080x1920/i.test(src);
 }
 
-/* Mobile zoom – bump to 1.22–1.26 for tighter */
+/* Mobile zoom – bump if you want tighter */
 const MOBILE_ZOOM = 1.22;
 
 /*****************
  * LAYOUT
  * - Desktop (3:2) = COVER (exactly like your perfect version)
- * - Portrait mobile (9:16 file) = CONTAIN + zoom, with hotspot remap
+ * - Portrait mobile (9:16) = CONTAIN + zoom, with hotspot remap
  *****************/
 let HS = null;
 
@@ -61,9 +61,9 @@ function layout(){
 
   if (usingPortraitImage()) {
     // PORTRAIT IMAGE
-    const contain = Math.min(vw/iw, vh/ih);   // fit whole portrait
-    const cover   = Math.max(vw/iw, vh/ih);   // fill edge-to-edge
-    const scale   = Math.min(contain * MOBILE_ZOOM, cover); // zoom but never beyond cover
+    const contain = Math.min(vw/iw, vh/ih);
+    const cover   = Math.max(vw/iw, vh/ih);
+    const scale   = Math.min(contain * MOBILE_ZOOM, cover);
 
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
@@ -76,8 +76,7 @@ function layout(){
     stage.style.height = dispH + 'px';
 
     // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
-    // y' = 0.3125 + 0.375*y, h' = 0.375*h (x,w unchanged)
-    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
+    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }); // x,w same
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
       contract:   remap(HS_LANDSCAPE.contract),
@@ -116,9 +115,9 @@ function place(spec, dispW, dispH){
   el.style.height = h + 'px';
   el.style.transform = `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`;
 }
-document.addEventListener('DOMContentLoaded', layout);
 
-// run & keep updated
+// Ensure layout runs when DOM is ready + on image load/resize
+document.addEventListener('DOMContentLoaded', layout);
 if (stationImg.complete) layout(); else stationImg.addEventListener('load', layout);
 window.addEventListener('resize', layout);
 if (window.visualViewport){
@@ -175,22 +174,51 @@ document.getElementById('lnk-telegram').href   = LINKS.TELEGRAM;
 document.getElementById('lnk-twitter').href    = LINKS.TWITTER;
 document.getElementById('lnk-whitepaper').href = LINKS.WHITEPAPER;
 
+/* Open/close wiring with capture + pointerdown (can’t be swallowed) */
 const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
 
-document.getElementById('hs-contract')  .addEventListener('click', ()=>open(mContract));
-document.getElementById('hs-links')     .addEventListener('click', ()=>open(mLinks));
-document.getElementById('hs-tokenomics').addEventListener('click', ()=>open(mTok));
+const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
+
+document.getElementById('hs-contract')
+  .addEventListener('pointerdown', onOpen(mContract), { capture:true });
+document.getElementById('hs-links')
+  .addEventListener('pointerdown', onOpen(mLinks), { capture:true });
+document.getElementById('hs-tokenomics')
+  .addEventListener('pointerdown', onOpen(mTok), { capture:true });
 
 document.querySelectorAll('.modal').forEach(mod=>{
-  mod.addEventListener('click', e=>{
-    if(e.target.matches('[data-close]') || e.target.classList.contains('modal-backdrop')) close(mod);
-  });
+  mod.addEventListener('click', (e)=>{
+    if(e.target.matches('[data-close]') || e.target.classList.contains('modal-backdrop')){
+      close(mod);
+    }
+  }, { capture:true });
 });
-document.addEventListener('keydown', e=>{
-  if(e.key==='Escape'){ [mContract,mLinks,mTok].forEach(m=>m.getAttribute('aria-hidden')==='false' && close(m)); }
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){
+    [mContract,mLinks,mTok].forEach(m=>{
+      if(m.getAttribute('aria-hidden')==='false') close(m);
+    });
+  }
 });
 
+/* Keyboard activation for hotspots */
+['hs-contract','hs-links','hs-tokenomics'].forEach(id=>{
+  const el = document.getElementById(id);
+  el.setAttribute('tabindex','0');
+  el.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' || e.key===' '){
+      e.preventDefault();
+      if(id==='hs-contract')  open(mContract);
+      if(id==='hs-links')     open(mLinks);
+      if(id==='hs-tokenomics')open(mTok);
+    }
+  }, { capture:true });
+});
+
+/*****************
+ * COPY BUTTON
+ *****************/
 document.getElementById('copyContract').addEventListener('click', async ()=>{
   try{
     await navigator.clipboard.writeText(CONTRACT_ADDRESS);
