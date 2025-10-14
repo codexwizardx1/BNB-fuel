@@ -10,7 +10,6 @@
 </head>
 <body>
   <div id="root">
-    <!-- Stage (sized by JS). Everything inside sits above the blurred bg -->
     <div class="stage" id="stage">
       <picture id="stationPicture">
         <source srcset="station_mobile_1080x1920.png"
@@ -20,7 +19,7 @@
 
       <div class="dark-overlay" id="overlay"></div>
 
-      <!-- Hotspots (clickable areas) -->
+      <!-- Hotspots -->
       <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
       <button class="hotspot" id="hs-contract"   aria-label="Show contract address"></button>
       <button class="hotspot" id="hs-links"      aria-label="Show links"></button>
@@ -78,7 +77,7 @@
     </div>
   </div>
 
-  <!-- Alignment HUD -->
+  <!-- Alignment HUD + Toggle -->
   <div id="align-hud">
     <div><b>Alignment Mode</b> — <kbd>A</kbd> toggle</div>
     <div>Target: <span id="hud-name">tokenomics</span></div>
@@ -88,6 +87,7 @@
     <div>Copy JSON: <kbd>C</kbd></div>
     <div style="margin-top:6px;color:#aaa">Align on DESKTOP. Mobile remaps auto.</div>
   </div>
+  <button id="align-toggle" type="button" title="Toggle Alignment (A)">Align</button>
 
   <script src="script.js"></script>
 </body>
