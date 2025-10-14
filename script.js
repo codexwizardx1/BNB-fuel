@@ -44,18 +44,16 @@ const HS_LANDSCAPE = {
 /*****************
  * UPDATED: detect by the actual loaded image (prevents wrong mode)
  *****************/
+// Detect by the image that actually loaded (desktop vs mobile file)
 function usingPortraitImage(){
   const src = stationImg.currentSrc || stationImg.src;
   return (stationImg.naturalHeight > stationImg.naturalWidth) ||
          /station_mobile_1080x1920/i.test(src);
 }
 
-/* UPDATED: stronger mobile zoom; increase to 1.20–1.24 if you want tighter */
-const MOBILE_ZOOM = 1.18;
+// Bump zoom until it feels right (try 1.22–1.26 if you want tighter)
+const MOBILE_ZOOM = 1.22;
 
-/*****************
- * LAYOUT (COVER on desktop image, CONTAIN+ZOOM on portrait image)
- *****************/
 let HS = null; // active hotspot set
 
 function layout(){
@@ -66,10 +64,9 @@ function layout(){
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // === MOBILE PORTRAIT IMAGE ===
+    // MOBILE PORTRAIT (9:16 file)
     const contain = Math.min(vw/iw, vh/ih);   // fit whole image
-    const cover   = Math.max(vw/iw, vh/ih);   // fill edge-to-edge
-    // UPDATED: apply zoom but never exceed cover (prevents empty edges)
+    const cover   = Math.max(vw/iw, vh/ih);   // no empty edges
     const scale   = Math.min(contain * MOBILE_ZOOM, cover);
 
     const dispW = Math.round(iw * scale);
@@ -77,13 +74,12 @@ function layout(){
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    stage.style.left   = offX + 'px';
-    stage.style.top    = offY + 'px';
+    stage.style.left = offX + 'px';
+    stage.style.top  = offY + 'px';
     stage.style.width  = dispW + 'px';
     stage.style.height = dispH + 'px';
 
-    // Remap hotspots from desktop→portrait (centered 1080×720 inside 1080×1920)
-    // y' = 0.3125 + 0.375*y, h' = 0.375*h (x,w unchanged)
+    // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
     const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
@@ -94,22 +90,23 @@ function layout(){
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
 
   } else {
-    // === DESKTOP / LANDSCAPE ORIGINAL IMAGE (back to your perfect COVER) ===
-    const scale = Math.max(vw/iw, vh/ih); // COVER
+    // DESKTOP / LANDSCAPE (3:2 file) — COVER exactly like your perfect version
+    const scale = Math.max(vw/iw, vh/ih);
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    stage.style.left   = offX + 'px';
-    stage.style.top    = offY + 'px';
+    stage.style.left = offX + 'px';
+    stage.style.top  = offY + 'px';
     stage.style.width  = dispW + 'px';
     stage.style.height = dispH + 'px';
 
-    HS = JSON.parse(JSON.stringify(HS_LANDSCAPE)); // original coords as-is
+    HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
   }
 }
+
 
 function place(spec, dispW, dispH){
   const el = spec.el;
