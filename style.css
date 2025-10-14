@@ -7,84 +7,113 @@
 
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:#000;overflow:hidden;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-
-/* === FRAME LOCKED TO 3:2 CANVAS === */
-.hero{
-  display:grid; place-items:center;
-  width:100vw; height:100vh; background:#000;
+body{
+  margin:0; background:#000; overflow:hidden; color:#fff;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
+
+/* === FULL-WIDTH, LOCKED 3:2 CANVAS (no cropping) === */
+.hero{ width:100vw; height:100vh; background:#000; }
 .frame{
   position:relative;
-  aspect-ratio: 3 / 2;      /* 1152x768 */
-  width:min(100vw, 1400px); /* scale down/up responsively */
+  width:100vw;                 /* fill width */
+  aspect-ratio:3 / 2;          /* 1152x768 */
   height:auto;
-  background:#000;          /* letterbox bars blend to black */
+  max-height:100vh;            /* constrain height */
+  margin:0 auto;
+  background:#000;             /* letterbox bars blend to black */
 }
 
-/* IMAGE uses CONTAIN (no cropping) so % hotspots stay true */
+/* Image fills the frame exactly (no crop because frame is 3:2 too) */
 #station{
   position:absolute; inset:0;
   width:100%; height:100%;
-  object-fit: contain;      /* <<< key change (was cover) */
+  object-fit: contain;         /* consistent % coords for hotspots */
+  transition: filter 80ms linear;
   z-index:0;
-  transition:filter 80ms linear;
 }
-
-/* overlays stay the same, but sit inside the same 3:2 canvas */
+#station.off{
+  filter:brightness(var(--off-brightness)) saturate(var(--off-saturation)) contrast(var(--off-contrast));
+}
 .dark-overlay{
   position:absolute; inset:0; z-index:1;
   background:#000; mix-blend-mode:multiply; opacity:0;
   transition:opacity 80ms linear; pointer-events:none;
 }
+.dark-overlay.off{ opacity:0.35; }
 
-/* hotspots unchanged — now they’ll align because canvas isn’t cropped */
-.hotspot{ position:absolute; z-index:3; background:transparent; border:0; padding:0; cursor:pointer; }
+/* Hotspots (click areas). Adjust a hair if needed for your final image. */
+.hotspot{
+  position:absolute; z-index:3; background:transparent; border:0; padding:0; margin:0; cursor:pointer;
+  /* Debug: uncomment while aligning */
+  /* outline:1px dashed rgba(243,186,47,.7); background:rgba(243,186,47,.08); */
+}
 
-/* (keep your existing hotspot positions) */
-.hs-tokenomics{ top:63.0%; left:32.0%; width:11.0%; height:3.6%; transform:translate(-50%,-50%) skewX(-7deg) rotate(-1deg); }
-.hs-contract  { top:63.2%; left:55.5%; width:10.2%; height:3.4%; transform:translate(-50%,-50%) skewX(-4deg) rotate(-1deg); }
-.hs-links     { top:64.1%; left:68.2%; width: 9.6%; height:3.3%; transform:translate(-50%,-50%) skewX(-5deg) rotate(-1deg); }
-
+/* Left = TOKENOMICS (3rd pump you added) */
+.hs-tokenomics{
+  top:63.0%; left:32.0%; width:11.0%; height:3.6%;
+  transform:translate(-50%,-50%) skewX(-7deg) rotate(-1deg);
+}
+/* Center = CONTRACT */
+.hs-contract{
+  top:63.2%; left:55.5%; width:10.2%; height:3.4%;
+  transform:translate(-50%,-50%) skewX(-4deg) rotate(-1deg);
+}
+/* Right = LINKS */
+.hs-links{
+  top:64.1%; left:68.2%; width:9.6%; height:3.3%;
+  transform:translate(-50%,-50%) skewX(-5deg) rotate(-1deg);
+}
 
 /* MODALS */
-.modal{position:fixed;inset:0;z-index:10;display:none}
-.modal[aria-hidden="false"]{display:block}
-.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
+.modal{ position:fixed; inset:0; z-index:10; display:none; }
+.modal[aria-hidden="false"]{ display:block; }
+.modal-backdrop{
+  position:absolute; inset:0; background:rgba(0,0,0,.6);
+  backdrop-filter: blur(2px);
+}
 .modal-card{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  background:#0b0b0b;border:1px solid #222;border-radius:12px;min-width:min(92vw,580px);
-  box-shadow:0 20px 60px rgba(0,0,0,.6);padding:22px
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  background:#0b0b0b; border:1px solid #222; border-radius:12px;
+  min-width:min(92vw,580px); padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
 }
-.modal-card h2{margin:0 0 10px;font-size:18px;color:var(--bnb-yellow)}
-.modal-card code{display:block;background:#111;border:1px solid #1f1f1f;padding:10px;border-radius:8px;font-size:14px;word-break:break-all}
-.modal-actions{display:flex;gap:10px;margin-top:14px}
+.modal-card h2{ margin:0 0 10px; font-size:18px; color:var(--bnb-yellow); }
+.modal-card code{
+  display:block; background:#111; border:1px solid #1f1f1f;
+  padding:10px; border-radius:8px; font-size:14px; word-break:break-all;
+}
+.modal-actions{ display:flex; gap:10px; margin-top:14px; }
 .modal-actions button{
-  background:var(--bnb-yellow);color:#000;border:0;border-radius:10px;padding:10px 14px;font-weight:800;letter-spacing:.04em;cursor:pointer
+  background:var(--bnb-yellow); color:#000; border:0; border-radius:10px;
+  padding:10px 14px; font-weight:800; letter-spacing:.04em; cursor:pointer;
 }
-.modal-actions button[data-close]{background:#1c1c1c;color:#eee;border:1px solid #2a2a2a}
-.modal-hint{opacity:.7;font-size:12px;margin-top:8px}
+.modal-actions button[data-close]{
+  background:#1c1c1c; color:#eee; border:1px solid #2a2a2a;
+}
+.modal-hint{ opacity:.7; font-size:12px; margin-top:8px; }
 
 /* Links grid */
-.links-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}
+.links-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:6px; }
 .link-btn{
-  display:block;text-align:center;text-decoration:none;border-radius:10px;padding:12px 10px;
-  background:var(--bnb-yellow);color:#000;font-weight:800;letter-spacing:.04em
+  display:block; text-align:center; text-decoration:none;
+  border-radius:10px; padding:12px 10px;
+  background:var(--bnb-yellow); color:#000; font-weight:800; letter-spacing:.04em;
 }
 
 /* Tokenomics table */
-.tok-table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:6px}
-.tok-table th,.tok-table td{padding:10px;border:1px solid #1f1f1f;background:#111}
-.tok-table th{color:#ddd;text-align:left;width:38%}
-.tok-table td{color:#fff}
+.tok-table{ width:100%; border-collapse:separate; border-spacing:0 8px; margin-top:6px; }
+.tok-table th,.tok-table td{ padding:10px; border:1px solid #1f1f1f; background:#111; }
+.tok-table th{ color:#ddd; text-align:left; width:38%; }
+.tok-table td{ color:#fff; }
 
-/* Accessibility: reduce motion */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
-  #station,.dark-overlay{transition:none}
+  #station,.dark-overlay{ transition:none; }
 }
 
-/* On small screens, make modals full width automatically */
+/* Small screens: wider buttons & smaller modal */
 @media (max-width:640px){
-  .modal-card{min-width:92vw}
-  .links-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .modal-card{ min-width:92vw; }
+  .links-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
