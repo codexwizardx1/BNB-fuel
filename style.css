@@ -118,3 +118,8 @@ body.debug #align-hud{ display:block; }
   cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.35);
 }
 #align-toggle[aria-pressed="true"]{ background:#F3BA2F; color:#000; border-color:#F3BA2F; }
+/* Visual outlines when alignment is ON */
+body.debug .hotspot{
+  outline: 2px dashed rgba(243,186,47,.95);
+  background: rgba(243,186,47,.10);
+}
