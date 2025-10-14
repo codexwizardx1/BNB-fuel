@@ -2,19 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BNB Fuel</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="hero">
     <div class="frame">
-      <!-- ONE image only -->
+      <!-- ONE IMAGE (lights-on). We simulate "off" via filters/overlay -->
       <img id="station" src="station_on.png" alt="BNB Fuel Station" />
-      <!-- a subtle dark overlay we can modulate -->
       <div class="dark-overlay"></div>
+
+      <!-- HOTSPOTS (click areas) -->
+      <button class="hotspot hs-tokenomics" aria-label="Show tokenomics"></button>
+      <button class="hotspot hs-contract"   aria-label="Show contract address"></button>
+      <button class="hotspot hs-links"      aria-label="Show links"></button>
     </div>
   </div>
+
+  <!-- MODALS -->
+  <!-- CONTRACT -->
+  <div class="modal" id="modal-contract" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contract-title">
+      <h2 id="contract-title">Contract Address</h2>
+      <code id="contract-value">0x...</code>
+      <div class="modal-actions">
+        <button id="copyContract">Copy</button>
+        <button data-close>Close</button>
+      </div>
+      <p class="modal-hint">Edit the address in <code>script.js</code>.</p>
+    </div>
+  </div>
+
+  <!-- LINKS -->
+  <div class="modal" id="modal-links" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="links-title">
+      <h2 id="links-title">Official Links</h2>
+      <div class="links-grid">
+        <a id="lnk-buy"       class="link-btn" target="_blank" rel="noopener">Buy</a>
+        <a id="lnk-chart"     class="link-btn" target="_blank" rel="noopener">Chart</a>
+        <a id="lnk-dextools"  class="link-btn" target="_blank" rel="noopener">DEXTools</a>
+        <a id="lnk-telegram"  class="link-btn" target="_blank" rel="noopener">Telegram</a>
+        <a id="lnk-twitter"   class="link-btn" target="_blank" rel="noopener">X / Twitter</a>
+        <a id="lnk-whitepaper"class="link-btn" target="_blank" rel="noopener">Whitepaper</a>
+      </div>
+      <div class="modal-actions">
+        <button data-close>Close</button>
+      </div>
+      <p class="modal-hint">Edit URLs in <code>script.js</code>.</p>
+    </div>
+  </div>
+
+  <!-- TOKENOMICS -->
+  <div class="modal" id="modal-tokenomics" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="toks-title">
+      <h2 id="toks-title">Tokenomics</h2>
+      <table class="tok-table">
+        <tbody>
+          <tr><th>Total Supply</th><td id="tok-supply">1,000,000,000 FUEL</td></tr>
+          <tr><th>Buy/Sell Tax</th><td id="tok-tax">0%</td></tr>
+          <tr><th>Liquidity</th><td id="tok-liq">Locked</td></tr>
+          <tr><th>Contract</th><td><code id="tok-addr">0x...</code></td></tr>
+        </tbody>
+      </table>
+      <div class="modal-actions">
+        <button data-close>Close</button>
+      </div>
+      <p class="modal-hint">You can edit these values in <code>script.js</code> or directly here.</p>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
