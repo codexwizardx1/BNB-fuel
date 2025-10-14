@@ -1,6 +1,14 @@
+:root {
+  --off-brightness: 0.18;   /* lower = darker when "off" */
+  --off-saturation: 0.35;   /* desaturate yellow */
+  --off-contrast: 0.95;     /* soften contrast a touch */
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
 body {
   margin: 0;
-  background: black;
+  background: #000;
   overflow: hidden;
 }
 
@@ -10,16 +18,46 @@ body {
   height: 100vh;
 }
 
-.station {
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#station {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: filter 80ms linear; /* quick response for fast flicker */
 }
 
-.on {
-  transition: opacity 0.15s ease;
+/* “Off” look is done by a filter on the SAME image */
+#station.off {
+  filter:
+    brightness(var(--off-brightness))
+    saturate(var(--off-saturation))
+    contrast(var(--off-contrast));
 }
 
+/* Extra realism: a faint black overlay that deepens highlights when off */
+.dark-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 80ms linear;
+  background: #000;
+  opacity: 0;              /* lights ON = no dark overlay */
+  mix-blend-mode: multiply;/* only darkens light areas */
+}
+
+/* When off, raise overlay slightly */
+.dark-overlay.off {
+  opacity: 0.35;           /* tune 0.25–0.45 to taste */
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #station, .dark-overlay { transition: none; }
+}
