@@ -13,20 +13,17 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* Full viewport container + blurred bg fill */
-#root{
-  position:fixed; inset:0; overflow:hidden;
-}
+/* Full viewport + blurred bg fill (never intercept clicks) */
+#root{ position:fixed; inset:0; overflow:hidden; }
 #root::before{
-  content:"";
-  position:fixed; inset:0; z-index:0;
+  content:""; position:fixed; inset:0; z-index:0;
   background: var(--bg-url) center / cover no-repeat;
   filter: blur(24px) brightness(0.55) saturate(1.08);
   transform: scale(1.12);
   pointer-events:none;
 }
 
-/* Stage is where we size/draw the visible image */
+/* Stage is where the visible image renders (sized in JS) */
 .stage{ position:absolute; z-index:2; }
 
 /* Picture/Image never intercept clicks */
@@ -46,7 +43,7 @@ body{
 }
 .dark-overlay.off{ opacity:0.35; }
 
-/* Hotspots on top */
+/* Hotspots (always on top & clickable) */
 .hotspot{
   position:absolute; z-index:9999; pointer-events:auto;
   background:transparent; border:0; padding:0; margin:0; cursor:pointer;
@@ -95,13 +92,13 @@ body{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
 
-/* ===== ALIGNMENT MODE (toggle with "A") ===== */
+/* ===== ALIGNMENT MODE (toggle with "A" or the Align button) ===== */
 body.debug .hotspot{
   outline: 2px dashed rgba(243,186,47,.95);
   background: rgba(243,186,47,.10);
 }
 #align-hud{
-  position: fixed; left: 12px; top: 12px; z-index: 99999;
+  position: fixed; left: 12px; top: 12px; z-index: 100000;
   background:#0b0b0b; border:1px solid #222; color:#fff;
   padding:10px 12px; border-radius:10px;
   font: 12px/1.3 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -112,3 +109,12 @@ body.debug #align-hud{ display:block; }
 #align-hud kbd{
   background:#111; border:1px solid #1f1f1f; border-radius:6px; padding:2px 6px; font-size:11px;
 }
+
+/* Align toggle button */
+#align-toggle{
+  position: fixed; right: 14px; top: 14px; z-index: 100000;
+  background:#0b0b0b; color:#fff; border:1px solid #222; border-radius:10px;
+  padding:10px 12px; font: 12px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+#align-toggle[aria-pressed="true"]{ background:#F3BA2F; color:#000; border-color:#F3BA2F; }
