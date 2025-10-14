@@ -10,9 +10,8 @@
 </head>
 <body>
   <div id="root">
-    <!-- Stage is where the visible image is drawn (sized by JS) -->
+    <!-- Stage (sized by JS). Everything inside sits above the blurred bg -->
     <div class="stage" id="stage">
-      <!-- Swap source on mobile portrait only -->
       <picture id="stationPicture">
         <source srcset="station_mobile_1080x1920.png"
                 media="(max-width: 768px) and (orientation: portrait)" />
@@ -21,7 +20,7 @@
 
       <div class="dark-overlay" id="overlay"></div>
 
-      <!-- Hotspots -->
+      <!-- Hotspots (clickable areas) -->
       <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
       <button class="hotspot" id="hs-contract"   aria-label="Show contract address"></button>
       <button class="hotspot" id="hs-links"      aria-label="Show links"></button>
