@@ -23,19 +23,17 @@ const stage      = document.getElementById('stage');
 const stationImg = document.getElementById('station');
 const overlay    = document.getElementById('overlay');
 
-/* update blurred background to match active image */
+/* keep blurred bg synced to active image (from <picture>) */
 function setBg(url){ document.documentElement.style.setProperty('--bg-url', `url("${url}")`); }
 setBg(stationImg.currentSrc || stationImg.src);
 
-/* when <picture> swaps source (mobile ↔ desktop), update bg + layout */
 stationImg.addEventListener('load', ()=>{
   setBg(stationImg.currentSrc || stationImg.src);
-  layoutContain();
+  layout();
 });
 
 /*****************
- * HOTSPOT FRACTIONS (desktop/original values you aligned)
- * x,y,w,h are fractions of the ORIGINAL image (0..1).
+ * ORIGINAL (desktop) HOTSPOT FRACTIONS you aligned
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2,   y: 0.647, w: 0.096, h: 0.036, skew: -7,  rot: -7   },
@@ -43,58 +41,76 @@ const HS_LANDSCAPE = {
   links:      { el: document.getElementById('hs-links'),      x: 0.661, y: 0.671, w: 0.048, h: 0.029, skew: -5,  rot: 2.2  },
 };
 
-/* Build HS for the currently loaded image:
-   - Desktop 3:2: use values as-is
-   - Mobile 9:16: center 1080x720 inside 1080x1920 → remap y & h
-     y' = 0.3125 + 0.375*y   (600px top pad / 1920; 720/1920 content)
-     h' = 0.375*h
-*/
-let HS = null;
-function buildHSForCurrentImage(){
-  const usingPortrait = stationImg.naturalHeight > stationImg.naturalWidth; // 1920 > 1080 on mobile
+/*****************
+ * MODE SWITCH
+ * - Desktop/tablet landscape => COVER (exactly like your “perfect” version)
+ * - Mobile portrait (<=768px & portrait) => CONTAIN with slight zoom + remap
+ *****************/
+const MOBILE_BP = 768;         // px
+const MOBILE_ZOOM = 1.08;      // 8% “comfort” zoom on mobile contain
 
-  const base = JSON.parse(JSON.stringify(HS_LANDSCAPE));
-  if (!usingPortrait){
-    HS = base;
-  } else {
-    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
-    HS = {
-      tokenomics: remap(base.tokenomics),
-      contract:   remap(base.contract),
-      links:      remap(base.links),
-    };
-  }
+function usingMobilePortrait(){
+  const mq = window.matchMedia(`(max-width: ${MOBILE_BP}px) and (orientation: portrait)`);
+  return mq.matches;
 }
 
 /*****************
- * LAYOUT (CONTAIN) — fit full image and place hotspots
+ * LAYOUT (chooses cover vs contain)
  *****************/
-function layoutContain(){
-  const vw = window.innerWidth;
-  const vh = (window.visualViewport && window.visualViewport.height)
-             ? Math.floor(window.visualViewport.height)
-             : window.innerHeight;
+let HS = null; // active hotspot set
 
-  const iw = stationImg.naturalWidth  || 1152;  // original file dimensions
+function layout(){
+  const vw = window.innerWidth;
+  const vh = (window.visualViewport?.height) ? Math.floor(window.visualViewport.height) : window.innerHeight;
+
+  const iw = stationImg.naturalWidth  || 1152;
   const ih = stationImg.naturalHeight || 768;
 
-  // CONTAIN: fit entire image; blurred bg (CSS) fills the rest
-  const scale = Math.min(vw / iw, vh / ih);
-  const dispW = Math.round(iw * scale);
-  const dispH = Math.round(ih * scale);
-  const offX  = Math.floor((vw - dispW) / 2);
-  const offY  = Math.floor((vh - dispH) / 2);
+  if (usingMobilePortrait()) {
+    // === MOBILE PORTRAIT: CONTAIN (whole image), tiny zoom, remap HS ===
+    const scaleBase = Math.min(vw/iw, vh/ih);
+    const scale = Math.min(scaleBase * MOBILE_ZOOM, Math.min(vw/iw, vh/ih)); // never exceed viewport
+    const dispW = Math.round(iw * scale);
+    const dispH = Math.round(ih * scale);
+    const offX  = Math.floor((vw - dispW) / 2);
+    const offY  = Math.floor((vh - dispH) / 2);
 
-  stage.style.left   = offX + 'px';
-  stage.style.top    = offY + 'px';
-  stage.style.width  = dispW + 'px';
-  stage.style.height = dispH + 'px';
+    // position stage
+    stage.style.left   = offX + 'px';
+    stage.style.top    = offY + 'px';
+    stage.style.width  = dispW + 'px';
+    stage.style.height = dispH + 'px';
 
-  buildHSForCurrentImage();
-  Object.values(HS).forEach(spec => placeHotspot(spec, dispW, dispH));
+    // build mobile HS by remapping your desktop fractions:
+    // mobile image is 1080x1920 with the 1080x720 center from desktop,
+    // so y' = 0.3125 + 0.375*y, h' = 0.375*h (x,w unchanged)
+    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
+    HS = {
+      tokenomics: remap(HS_LANDSCAPE.tokenomics),
+      contract:   remap(HS_LANDSCAPE.contract),
+      links:      remap(HS_LANDSCAPE.links),
+    };
+
+    Object.values(HS).forEach(spec => place(spec, dispW, dispH));
+  } else {
+    // === DESKTOP / LANDSCAPE: COVER (edge-to-edge), original HS exactly ===
+    const scale = Math.max(vw/iw, vh/ih);
+    const dispW = Math.round(iw * scale);
+    const dispH = Math.round(ih * scale);
+    const offX  = Math.floor((vw - dispW) / 2);
+    const offY  = Math.floor((vh - dispH) / 2);
+
+    stage.style.left   = offX + 'px';
+    stage.style.top    = offY + 'px';
+    stage.style.width  = dispW + 'px';
+    stage.style.height = dispH + 'px';
+
+    HS = JSON.parse(JSON.stringify(HS_LANDSCAPE)); // use as-is
+    Object.values(HS).forEach(spec => place(spec, dispW, dispH));
+  }
 }
 
-function placeHotspot(spec, dispW, dispH){
+function place(spec, dispW, dispH){
   const el = spec.el;
   const x = spec.x * dispW;
   const y = spec.y * dispH;
@@ -107,23 +123,19 @@ function placeHotspot(spec, dispW, dispH){
   el.style.transform = `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`;
 }
 
-// Run layout
-if (stationImg.complete) layoutContain();
-else stationImg.addEventListener('load', layoutContain);
-window.addEventListener('resize', layoutContain);
-if (window.visualViewport){
-  visualViewport.addEventListener('resize', layoutContain);
-  visualViewport.addEventListener('scroll',  layoutContain);
-}
+// run & keep updated
+if (stationImg.complete) layout(); else stationImg.addEventListener('load', layout);
+window.addEventListener('resize', layout);
+if (window.visualViewport){ visualViewport.addEventListener('resize', layout); visualViewport.addEventListener('scroll', layout); }
 
 /*****************
- * FAST FLICKER (single-image method)
+ * FAST FLICKER (unchanged)
  *****************/
 function setOff(isOff){
   stationImg.classList.toggle('off', isOff);
   overlay.classList.toggle('off', isOff);
 }
-let flickerTimer = null, burstTimer = null;
+let flickerTimer=null, burstTimer=null;
 function stopFlicker(){ clearTimeout(flickerTimer); flickerTimer=null; clearInterval(burstTimer); burstTimer=null; }
 function startFlicker(){
   stopFlicker();
@@ -144,7 +156,7 @@ document.addEventListener('visibilitychange', ()=>{
 });
 
 /*****************
- * MODALS + DATA
+ * MODALS + DATA (unchanged)
  *****************/
 const mContract = document.getElementById('modal-contract');
 const mLinks    = document.getElementById('modal-links');
