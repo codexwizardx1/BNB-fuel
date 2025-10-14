@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BNB Fuel</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Optional: preload hero image to avoid flash -->
+  <link rel="preload" as="image" href="station_on.png" />
 </head>
 <body>
   <div id="root">
@@ -13,7 +15,7 @@
       <img id="station" src="station_on.png" alt="BNB Fuel Station" />
       <div class="dark-overlay" id="overlay"></div>
 
-      <!-- Hotspots are positioned in JS based on cover math -->
+      <!-- Hotspots positioned in JS based on cover math -->
       <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
       <button class="hotspot" id="hs-contract"   aria-label="Show contract address"></button>
       <button class="hotspot" id="hs-links"      aria-label="Show links"></button>
