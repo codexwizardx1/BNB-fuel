@@ -8,8 +8,12 @@
 </head>
 <body>
   <div class="hero">
-    <img src="station_off.png" class="station">
-    <img src="station_on.png" class="station on" id="lights">
+    <div class="frame">
+      <!-- ONE image only -->
+      <img id="station" src="station_on.png" alt="BNB Fuel Station" />
+      <!-- a subtle dark overlay we can modulate -->
+      <div class="dark-overlay"></div>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>
