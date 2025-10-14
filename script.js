@@ -42,20 +42,19 @@ const HS_LANDSCAPE = {
 };
 
 /*****************
- * MODE SWITCH
- * - Desktop/tablet landscape => COVER (exactly like your “perfect” version)
- * - Mobile portrait (<=768px & portrait) => CONTAIN with slight zoom + remap
+ * UPDATED: detect by the actual loaded image (prevents wrong mode)
  *****************/
-const MOBILE_BP = 768;         // px
-const MOBILE_ZOOM = 1.08;      // 8% “comfort” zoom on mobile contain
-
-function usingMobilePortrait(){
-  const mq = window.matchMedia(`(max-width: ${MOBILE_BP}px) and (orientation: portrait)`);
-  return mq.matches;
+function usingPortraitImage(){
+  const src = stationImg.currentSrc || stationImg.src;
+  return (stationImg.naturalHeight > stationImg.naturalWidth) ||
+         /station_mobile_1080x1920/i.test(src);
 }
 
+/* UPDATED: stronger mobile zoom; increase to 1.20–1.24 if you want tighter */
+const MOBILE_ZOOM = 1.18;
+
 /*****************
- * LAYOUT (chooses cover vs contain)
+ * LAYOUT (COVER on desktop image, CONTAIN+ZOOM on portrait image)
  *****************/
 let HS = null; // active hotspot set
 
@@ -66,24 +65,25 @@ function layout(){
   const iw = stationImg.naturalWidth  || 1152;
   const ih = stationImg.naturalHeight || 768;
 
-  if (usingMobilePortrait()) {
-    // === MOBILE PORTRAIT: CONTAIN (whole image), tiny zoom, remap HS ===
-    const scaleBase = Math.min(vw/iw, vh/ih);
-    const scale = Math.min(scaleBase * MOBILE_ZOOM, Math.min(vw/iw, vh/ih)); // never exceed viewport
+  if (usingPortraitImage()) {
+    // === MOBILE PORTRAIT IMAGE ===
+    const contain = Math.min(vw/iw, vh/ih);   // fit whole image
+    const cover   = Math.max(vw/iw, vh/ih);   // fill edge-to-edge
+    // UPDATED: apply zoom but never exceed cover (prevents empty edges)
+    const scale   = Math.min(contain * MOBILE_ZOOM, cover);
+
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    // position stage
     stage.style.left   = offX + 'px';
     stage.style.top    = offY + 'px';
     stage.style.width  = dispW + 'px';
     stage.style.height = dispH + 'px';
 
-    // build mobile HS by remapping your desktop fractions:
-    // mobile image is 1080x1920 with the 1080x720 center from desktop,
-    // so y' = 0.3125 + 0.375*y, h' = 0.375*h (x,w unchanged)
+    // Remap hotspots from desktop→portrait (centered 1080×720 inside 1080×1920)
+    // y' = 0.3125 + 0.375*y, h' = 0.375*h (x,w unchanged)
     const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
@@ -92,9 +92,10 @@ function layout(){
     };
 
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
+
   } else {
-    // === DESKTOP / LANDSCAPE: COVER (edge-to-edge), original HS exactly ===
-    const scale = Math.max(vw/iw, vh/ih);
+    // === DESKTOP / LANDSCAPE ORIGINAL IMAGE (back to your perfect COVER) ===
+    const scale = Math.max(vw/iw, vh/ih); // COVER
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX  = Math.floor((vw - dispW) / 2);
@@ -105,7 +106,7 @@ function layout(){
     stage.style.width  = dispW + 'px';
     stage.style.height = dispH + 'px';
 
-    HS = JSON.parse(JSON.stringify(HS_LANDSCAPE)); // use as-is
+    HS = JSON.parse(JSON.stringify(HS_LANDSCAPE)); // original coords as-is
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
   }
 }
@@ -126,7 +127,10 @@ function place(spec, dispW, dispH){
 // run & keep updated
 if (stationImg.complete) layout(); else stationImg.addEventListener('load', layout);
 window.addEventListener('resize', layout);
-if (window.visualViewport){ visualViewport.addEventListener('resize', layout); visualViewport.addEventListener('scroll', layout); }
+if (window.visualViewport){
+  visualViewport.addEventListener('resize', layout);
+  visualViewport.addEventListener('scroll',  layout);
+}
 
 /*****************
  * FAST FLICKER (unchanged)
