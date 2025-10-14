@@ -10,11 +10,7 @@ const LINKS = {
   TWITTER:    "https://x.com/yourhandle",
   WHITEPAPER: "https://example.com/whitepaper.pdf",
 };
-const TOKENOMICS = {
-  supply: "1,000,000,000 FUEL",
-  tax: "0%",
-  liquidity: "Locked",
-};
+const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
 /*****************
  * ELEMENTS
@@ -26,35 +22,35 @@ const overlay    = document.getElementById('overlay');
 /* keep blurred bg synced to active image (from <picture>) */
 function setBg(url){ document.documentElement.style.setProperty('--bg-url', `url("${url}")`); }
 setBg(stationImg.currentSrc || stationImg.src);
-
-stationImg.addEventListener('load', ()=>{
-  setBg(stationImg.currentSrc || stationImg.src);
-  layout();
-});
+stationImg.addEventListener('load', ()=>{ setBg(stationImg.currentSrc || stationImg.src); layout(); });
 
 /*****************
- * ORIGINAL (desktop) HOTSPOT FRACTIONS you aligned
+ * DESKTOP HOTSPOT FRACTIONS (your aligned values)
  *****************/
 const HS_LANDSCAPE = {
-  tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2,   y: 0.647, w: 0.096, h: 0.036, skew: -7,  rot: -7   },
-  contract:   { el: document.getElementById('hs-contract'),   x: 0.481, y: 0.645, w: 0.102, h: 0.034, skew: -4,  rot: 5.2  },
-  links:      { el: document.getElementById('hs-links'),      x: 0.661, y: 0.671, w: 0.048, h: 0.029, skew: -5,  rot: 2.2  },
+  tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7,  rot: -7   },
+  contract:   { el: document.getElementById('hs-contract'),   x: 0.4810, y: 0.6450, w: 0.1020, h: 0.0340, skew: -4,  rot: 5.2  },
+  links:      { el: document.getElementById('hs-links'),      x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5,  rot: 2.2  },
 };
 
 /*****************
- * UPDATED: detect by the actual loaded image (prevents wrong mode)
+ * DETECT WHICH IMAGE ACTUALLY LOADED
  *****************/
-// Detect by the image that actually loaded (desktop vs mobile file)
 function usingPortraitImage(){
   const src = stationImg.currentSrc || stationImg.src;
   return (stationImg.naturalHeight > stationImg.naturalWidth) ||
          /station_mobile_1080x1920/i.test(src);
 }
 
-// Bump zoom until it feels right (try 1.22–1.26 if you want tighter)
+/* Mobile zoom – bump to 1.22–1.26 for tighter */
 const MOBILE_ZOOM = 1.22;
 
-let HS = null; // active hotspot set
+/*****************
+ * LAYOUT
+ * - Desktop (3:2) = COVER (exactly like your perfect version)
+ * - Portrait mobile (9:16 file) = CONTAIN + zoom, with hotspot remap
+ *****************/
+let HS = null;
 
 function layout(){
   const vw = window.innerWidth;
@@ -64,22 +60,23 @@ function layout(){
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // MOBILE PORTRAIT (9:16 file)
-    const contain = Math.min(vw/iw, vh/ih);   // fit whole image
-    const cover   = Math.max(vw/iw, vh/ih);   // no empty edges
-    const scale   = Math.min(contain * MOBILE_ZOOM, cover);
+    // PORTRAIT IMAGE
+    const contain = Math.min(vw/iw, vh/ih);   // fit whole portrait
+    const cover   = Math.max(vw/iw, vh/ih);   // fill edge-to-edge
+    const scale   = Math.min(contain * MOBILE_ZOOM, cover); // zoom but never beyond cover
 
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    stage.style.left = offX + 'px';
-    stage.style.top  = offY + 'px';
+    stage.style.left   = offX + 'px';
+    stage.style.top    = offY + 'px';
     stage.style.width  = dispW + 'px';
     stage.style.height = dispH + 'px';
 
     // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
+    // y' = 0.3125 + 0.375*y, h' = 0.375*h (x,w unchanged)
     const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
@@ -90,15 +87,15 @@ function layout(){
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
 
   } else {
-    // DESKTOP / LANDSCAPE (3:2 file) — COVER exactly like your perfect version
+    // DESKTOP / LANDSCAPE IMAGE — COVER (original math)
     const scale = Math.max(vw/iw, vh/ih);
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    stage.style.left = offX + 'px';
-    stage.style.top  = offY + 'px';
+    stage.style.left   = offX + 'px';
+    stage.style.top    = offY + 'px';
     stage.style.width  = dispW + 'px';
     stage.style.height = dispH + 'px';
 
@@ -106,7 +103,6 @@ function layout(){
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
   }
 }
-
 
 function place(spec, dispW, dispH){
   const el = spec.el;
@@ -130,7 +126,7 @@ if (window.visualViewport){
 }
 
 /*****************
- * FAST FLICKER (unchanged)
+ * FAST FLICKER
  *****************/
 function setOff(isOff){
   stationImg.classList.toggle('off', isOff);
@@ -157,7 +153,7 @@ document.addEventListener('visibilitychange', ()=>{
 });
 
 /*****************
- * MODALS + DATA (unchanged)
+ * MODALS + DATA
  *****************/
 const mContract = document.getElementById('modal-contract');
 const mLinks    = document.getElementById('modal-links');
