@@ -117,3 +117,24 @@ body{
   outline-offset:2px;
   border-radius:8px;
 }
+/* Blurred edge fill: removes black bars while keeping full image visible */
+#root::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0; /* behind stage */
+  background: url("station_on.png") center / cover no-repeat;
+  filter: blur(24px) brightness(0.55) saturate(1.1);
+  transform: scale(1.12); /* push edges out a bit so blur doesn't show seams */
+}
+
+/* make sure the stage sits above the bg fill */
+.stage{ z-index: 1; }
+
+/* (optional) subtle vignette to frame the hero */
+.stage::after{
+  content:"";
+  position:absolute; inset:0; z-index:2; pointer-events:none;
+  box-shadow: inset 0 0 180px rgba(0,0,0,.7);
+}
+
