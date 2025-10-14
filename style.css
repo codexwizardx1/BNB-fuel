@@ -100,3 +100,12 @@ body{
 .hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
+/* Ensure the image wrapper never intercepts clicks on desktop */
+#stationPicture { position:absolute; inset:0; z-index:0; pointer-events:none; }
+
+/* Image also never catches clicks */
+#station { pointer-events:none; z-index:0; }
+
+/* Keep hotspots definitely above everything */
+.hotspot { position:absolute; z-index:5; display:block; }
+.dark-overlay { z-index:1; }  /* already pointer-events:none */
