@@ -5,17 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BNB Fuel</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Optional: preload hero image to avoid flash -->
   <link rel="preload" as="image" href="station_on.png" />
+  <link rel="preload" as="image" href="station_mobile_1080x1920.png" />
 </head>
 <body>
   <div id="root">
-    <!-- Stage is the area where the image actually draws after cover-scaling -->
+    <!-- Stage is where the visible image is drawn (sized by JS) -->
     <div class="stage" id="stage">
-      <img id="station" src="station_on.png" alt="BNB Fuel Station" />
+      <!-- Swap source on mobile portrait only -->
+      <picture id="stationPicture">
+        <source srcset="station_mobile_1080x1920.png"
+                media="(max-width: 768px) and (orientation: portrait)" />
+        <img id="station" src="station_on.png" alt="BNB Fuel Station" />
+      </picture>
+
       <div class="dark-overlay" id="overlay"></div>
 
-      <!-- Hotspots positioned in JS based on cover math -->
+      <!-- Hotspots -->
       <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
       <button class="hotspot" id="hs-contract"   aria-label="Show contract address"></button>
       <button class="hotspot" id="hs-links"      aria-label="Show links"></button>
