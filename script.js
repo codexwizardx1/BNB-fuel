@@ -45,8 +45,32 @@ function usingPortraitImage(){
 const MOBILE_ZOOM = 1.22;
 
 /*****************
- * LAYOUT
- * Expose as window.layout so inline toggler can call it.
+ * SEED: ensure boxes appear in Align mode even before perfect sizing
+ *****************/
+window.seedHotspots = function seedHotspots(){
+  if (!window.__ALIGN_DEBUG) return;
+  const els = [
+    document.getElementById('hs-tokenomics'),
+    document.getElementById('hs-contract'),
+    document.getElementById('hs-links')
+  ];
+  // If first hotspot has tiny/zero size, seed all three
+  const needSeed = !els[0] || (els[0].offsetWidth < 4 || els[0].offsetHeight < 4);
+  if (!needSeed) return;
+  els.forEach((el, i)=>{
+    if(!el) return;
+    Object.assign(el.style, {
+      left:  (20 + i*220) + 'px',
+      top:   '20px',
+      width: '200px',
+      height:'60px',
+      transform: 'none'
+    });
+  });
+};
+
+/*****************
+ * LAYOUT (exposed for inline toggler)
  *****************/
 let HS = null;
 
@@ -76,7 +100,7 @@ window.layout = function layout(){
     });
 
     // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
-    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }); // x,w unchanged
+    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
       contract:   remap(HS_LANDSCAPE.contract),
@@ -84,7 +108,6 @@ window.layout = function layout(){
     };
 
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
-
   } else {
     /* ===== DESKTOP / COVER (and forced during Align) ===== */
     const scale = Math.max(vw/iw, vh/ih);
@@ -101,6 +124,9 @@ window.layout = function layout(){
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
   }
+
+  // If in Align mode and boxes ended up 0×0 for any reason, seed them
+  window.seedHotspots();
 };
 
 function place(spec, dispW, dispH){
@@ -208,13 +234,8 @@ document.addEventListener('keydown', (e)=>{
 });
 
 /*****************
- * ===== ALIGNMENT MODE (desktop) =====
- * Toggle: button or "A"
- * Target cycle: Tab (tokenomics → contract → links)
- * Nudge: arrows (x/y)
- * Resize: Shift+arrows (w/h)
- * Skew: [ / ]    Rotate: ; / '
- * Copy: C  (copies JSON)
+ * ALIGNMENT MODE (desktop)
+ * Tab cycles target, arrows move, Shift+arrows resize, [ ] skew, ; ' rotate, C copies JSON
  *****************/
 (function(){
   const order = ['tokenomics','contract','links'];
@@ -227,9 +248,7 @@ document.addEventListener('keydown', (e)=>{
   function current(){ return HS_LANDSCAPE[currentKey()]; }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
-  function updateHUD(){
-    if(hud) hudName.textContent = currentKey();
-  }
+  function updateHUD(){ if(hud) hudName.textContent = currentKey(); }
 
   function copyJSON(){
     const out = {};
@@ -241,14 +260,13 @@ document.addEventListener('keydown', (e)=>{
         skew:+Number(v.skew||0).toFixed(2), rot:+Number(v.rot||0).toFixed(2)
       };
     });
-    const text = JSON.stringify(out, null, 2);
-    navigator.clipboard.writeText(text).catch(()=>{});
+    navigator.clipboard.writeText(JSON.stringify(out, null, 2)).catch(()=>{});
     if (hud) { hud.style.boxShadow = '0 0 0 2px #F3BA2F inset'; setTimeout(()=>hud.style.boxShadow='none', 350); }
   }
 
   function nudge(e){
     if (!window.__ALIGN_DEBUG) return;
-    if (usingPortraitImage && usingPortraitImage()) return; // align only on desktop image
+    if (usingPortraitImage && usingPortraitImage()) return; // desktop only
 
     const v = current();
     const baseStep = 0.002; // 0.2%
