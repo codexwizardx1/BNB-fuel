@@ -3,20 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BNB Fuel Intro</title>
+  <title>BI-FUEL Intro</title>
   <link rel="stylesheet" href="intro.css" />
 </head>
 <body>
-  <div class="intro-container">
+  <!-- ✅ Base Layer (underneath) -->
+  <div id="baseLayer">
+    <img src="bi-fuel-logo.png" alt="BI-FUEL Logo" class="logo-reveal" />
+  </div>
+
+  <!-- 🚀 Intro Layer (on top) -->
+  <div class="intro-container" id="introLayer">
     <div class="can-wrapper">
-      <!-- Wave container -->
       <div class="tank">
         <div class="wave"></div>
       </div>
-      <!-- Jerry can image as top layer -->
       <img src="jerrycan.png" alt="Jerry Can" class="can-outline" />
     </div>
-
     <div id="fuelText" class="label">0%</div>
   </div>
 
