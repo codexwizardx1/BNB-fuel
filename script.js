@@ -121,6 +121,17 @@ function place(spec, dispW, dispH) {
   const w = spec.w * dispW;
   const h = spec.h * dispH;
 
+  /*****************
+ * HERO IMAGES
+ *****************/
+const HERO_IMAGES = {
+  default: "station_on.png",
+  tokenomics: "station_hover_tokenomics.png",
+  contract: "station_hover_contract.png",
+  links: "station_hover_links.png"
+};
+
+
   Object.assign(spec.el.style, {
     position: "absolute",
     left: x - w / 2 + "px",
