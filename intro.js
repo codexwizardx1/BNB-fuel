@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
       clearInterval(interval);
       text.textContent = 'FULL';
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = 'main.html';
       }, 800);
     }
   }, STEP_TIME);
