@@ -81,15 +81,14 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-   // Zoomed out a bit
-const scale = Math.max(vw / iw, vh / ih) * 0.9;   // adjust 0.9 to taste
+ // Force full-width, zoomed-out height
+const scale = (vw / iw) * 0.9;  // always stretch to full width
+const dispW = Math.round(iw * scale);
+const dispH = Math.round(ih * scale);
+const offX  = 0;
+const offY  = Math.floor((vh - dispH) / 2);
+Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
 
-    const dispW = Math.round(iw * scale);
-    const dispH = Math.round(ih * scale);
-    const offX = Math.floor((vw - dispW) / 2);
-    const offY = Math.floor((vh - dispH) / 2);
-
-    Object.assign(stage.style, { left: offX + "px", top: offY + "px", width: dispW + "px", height: dispH + "px" });
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
   }
