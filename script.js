@@ -60,7 +60,7 @@ function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-const MOBILE_ZOOM = 1.8; // adjust for more/less zoom on mobile
+const MOBILE_ZOOM = 1.5; // adjust for more/less zoom on mobile
 
 /*****************
  * LAYOUT
