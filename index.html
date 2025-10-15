@@ -79,7 +79,7 @@
 
   <!-- Alignment HUD + Toggle -->
   <div id="align-hud">
-    <div><b>Alignment Mode</b> — <kbd>A</kbd> toggle</div>
+    <div><b>Alignment Mode</b> — <kbd>A</kbd> toggle or click <b>Align</b></div>
     <div>Target: <span id="hud-name">tokenomics</span></div>
     <div>Move: <kbd>←</kbd><kbd>→</kbd> / <kbd>↑</kbd><kbd>↓</kbd></div>
     <div>Resize: <kbd>Shift</kbd> + arrows</div>
@@ -89,22 +89,23 @@
   </div>
   <button id="align-toggle" type="button" title="Toggle Alignment (A)">Align</button>
 
-  <script src="script.js"></script>
+  <!-- Tiny inline toggler to guarantee the button/A always work -->
   <script>
-(function(){
-  function toggleAlign(){
-    document.body.classList.toggle('debug');
-    const btn = document.getElementById('align-toggle');
-    if (btn) btn.setAttribute('aria-pressed', String(document.body.classList.contains('debug')));
-  }
-  // Button click
-  document.getElementById('align-toggle')?.addEventListener('click', toggleAlign, {capture:true});
-  // Keyboard (A)
-  window.addEventListener('keydown', function(e){
-    if (e.key === 'a' || e.key === 'A') { e.preventDefault(); toggleAlign(); }
-  }, true);
-})();
-</script>
+  (function(){
+    function toggleAlign(){
+      document.body.classList.toggle('debug');
+      window.__ALIGN_DEBUG = document.body.classList.contains('debug');
+      const btn = document.getElementById('align-toggle');
+      if (btn) btn.setAttribute('aria-pressed', String(window.__ALIGN_DEBUG));
+      if (typeof window.layout === 'function') window.layout(); // reflow sizing
+    }
+    document.getElementById('align-toggle')?.addEventListener('click', toggleAlign, {capture:true});
+    window.addEventListener('keydown', function(e){
+      if (e.key === 'a' || e.key === 'A') { e.preventDefault(); toggleAlign(); }
+    }, true);
+  })();
+  </script>
 
+  <script src="script.js"></script>
 </body>
 </html>
