@@ -1,3 +1,4 @@
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -7,42 +8,37 @@
 body {
   width: 100%;
   height: 100vh;
-  background: #000;
+  background-color: #000;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  font-family: system-ui, sans-serif;
-}
-
-.intro-container {
-  display: flex;
   flex-direction: column;
-  align-items: center;
+  font-family: system-ui, sans-serif;
+  color: #fff;
 }
 
-/* Container matching your jerrycan image size */
+/* WRAPPER */
 .can-wrapper {
   position: relative;
-  width: 220px;   /* match your actual image size */
+  width: 220px;      /* adjust this to match your jerrycan.png size */
   height: 300px;
 }
 
-/* Wave container behind the image */
+/* FILL AREA — uses mask */
 .tank {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
+  mask-image: url('jerrycan-mask.png');
+  -webkit-mask-image: url('jerrycan-mask.png');
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: cover;
+  -webkit-mask-size: cover;
   overflow: hidden;
-  clip-path: polygon(
-    20% 10%, 80% 10%, 80% 85%, 60% 95%, 40% 95%, 20% 85%
-  ); /* this polygon approximates the inside of the can */
-  background: transparent;
   z-index: 1;
 }
 
-/* The wave itself */
+/* WAVE EFFECT */
 .wave {
   background: #F3BA2F;
   position: absolute;
@@ -55,69 +51,40 @@ body {
   animation: waveRotate 30s linear infinite;
 }
 
-@keyframes waveRotate {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(3600deg); }
-}
-
+/* Filling animation trigger */
 .tank.filling .wave {
   animation:
     waveRotate 30s linear infinite,
     waveFill 4s ease-out forwards;
 }
 
+/* Wave rotation (endless) */
+@keyframes waveRotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(3600deg); }
+}
+
+/* Filling up from bottom */
 @keyframes waveFill {
   0%   { top: 110%; }
   100% { top: 0%; }
 }
 
-/* Outline image on top */
+/* OUTLINE stays on top of mask */
 .can-outline {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  z-index: 2;
   pointer-events: none;
+  z-index: 2;
 }
 
-
-/* Wave itself */
-.wave {
-  background: #F3BA2F;
-  position: absolute;
-  top: 110%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  border-radius: 38%;
-  transform: rotate(0deg);
-  animation: waveRotate 30s linear infinite;
-}
-
-@keyframes waveRotate {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(3600deg); }
-}
-
-.tank.filling .wave {
-  animation:
-    waveRotate 30s linear infinite,
-    waveFill 4s ease-out forwards;
-}
-
-@keyframes waveFill {
-  0%   { top: 110%; }
-  100% { top: 0%; }
-}
-
-.label {
-  margin-top: 20px;
+/* Percentage text */
+#fuelText {
+  margin-top: 24px;
+  font-size: 24px;
+  font-weight: bold;
   color: #F3BA2F;
-  font-weight: 800;
-  font-size: 22px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
 }
