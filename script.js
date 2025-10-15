@@ -173,9 +173,10 @@ const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
 const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
 
-document.getElementById('hs-contract').addEventListener('pointerdown', onOpen(mContract), { capture:true });
-document.getElementById('hs-links')   .addEventListener('pointerdown', onOpen(mLinks),    { capture:true });
-document.getElementById('hs-tokenomics').addEventListener('pointerdown', onOpen(mTok),    { capture:true });
+document.getElementById('hs-contract').addEventListener('click', onOpen(mContract));
+document.getElementById('hs-links')   .addEventListener('click', onOpen(mLinks));
+document.getElementById('hs-tokenomics').addEventListener('click', onOpen(mTok));
+
 
 document.querySelectorAll('.modal').forEach(mod=>{
   mod.addEventListener('click', (e)=>{
