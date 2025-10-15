@@ -218,6 +218,20 @@ const onOpen = (modal) => (e) => {
     el.addEventListener("click", onOpen(modal));
   }
 });
+// Hover to swap image
+const swapHero = (key) => {
+  stationImg.src = HERO_IMAGES[key] || HERO_IMAGES.default;
+  setBg(stationImg.src);
+};
+
+["tokenomics", "contract", "links"].forEach((key) => {
+  const el = document.getElementById(`hs-${key}`);
+  if (el && HERO_IMAGES[key]) {
+    el.addEventListener("mouseenter", () => swapHero(key));
+    el.addEventListener("mouseleave", () => swapHero("default"));
+  }
+});
+
 
 document.querySelectorAll(".modal").forEach((mod) => {
   mod.addEventListener(
