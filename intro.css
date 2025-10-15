@@ -20,56 +20,61 @@ body {
   align-items: center;
 }
 
-.tank-wrapper {
+.can-wrapper {
   position: relative;
-  width: 160px;
-  height: 240px;
+  width: 180px;
+  height: 250px;
 }
 
-/* Tank shape */
-.tank,
-.tank-outline {
+/* Jerry can shape */
+.can,
+.can-outline {
   position: absolute;
   top: 0;
   left: 0;
-  width: 160px;
-  height: 240px;
+  width: 180px;
+  height: 250px;
   clip-path: polygon(
-    15% 0%, 65% 0%, 70% 5%, 80% 5%, 80% 15%, 88% 20%, 88% 90%, 
-    75% 100%, 25% 100%, 12% 90%, 12% 20%, 20% 15%, 20% 5%, 30% 5%
+    15% 0%, 60% 0%, 65% 5%, 100% 5%, 100% 20%, 85% 20%, 85% 95%, 
+    15% 95%, 15% 20%, 0% 20%, 0% 5%, 40% 5%, 45% 0%
   );
 }
 
-.tank {
+.can {
   overflow: hidden;
   background: black;
   z-index: 1;
 }
 
-.tank-outline {
+.can-outline {
   border: 3px solid #F3BA2F;
   box-shadow: 0 0 15px #F3BA2F;
   pointer-events: none;
   z-index: 3;
 }
 
-/* Smooth rotating wave */
+/* Wave fill */
 .wave {
   background: #F3BA2F;
   position: absolute;
-  top: 0%;
+  top: 110%;
   left: -50%;
   width: 200%;
   height: 200%;
   border-radius: 38%;
-  transform: rotate(0deg);
-  animation: wave 30s linear infinite;
+  animation:
+    waveRotate 30s linear infinite,
+    waveFill 4s ease-out forwards;
 }
 
-/* Long smooth spin like your circle example */
-@keyframes wave {
+@keyframes waveRotate {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(3600deg); }
+}
+
+@keyframes waveFill {
+  0%   { top: 110%; }
+  100% { top: 0%; }
 }
 
 .label {
