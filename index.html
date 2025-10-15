@@ -1,25 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BNB Fuel Intro</title>
-  <link rel="stylesheet" href="intro.css" />
-</head>
-<body>
-  <div class="intro-container">
-    <div class="can-wrapper">
-      <!-- Wave container -->
-      <div class="tank">
-        <div class="wave"></div>
-      </div>
-      <!-- Jerry can image as top layer -->
-      <img src="jerrycan.png" alt="Jerry Can" class="can-outline" />
-    </div>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    <div id="fuelText" class="label">0%</div>
-  </div>
+body {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
 
-  <script src="intro.js"></script>
-</body>
-</html>
+/* BASE LAYER (underneath) */
+#baseLayer {
+  position: fixed;
+  inset: 0;
+  background-color: #f8d33a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 0;
+}
+
+.logo-reveal {
+  width: 200px;
+  opacity: 1;
+}
+
+/* INTRO LAYER (on top) */
+#introLayer {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 5;
+  transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+#introLayer.slide-up {
+  transform: translateY(-100%);
+}
+
+/* CAN + FILL ANIMATION */
+.can-wrapper {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  max-width: 80vw;
+  max-height: 80vw;
+}
+
+.tank {
+  position: absolute;
+  inset: 0;
+  mask-image: url('jerrycan-mask.png');
+  -webkit-mask-image: url('jerrycan-mask.png');
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.wave {
+  background: #000;
+  position: absolute;
+  top: 110%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  border-radius: 38%;
+  transform: rotate(0deg);
+  animation: waveRotate 30s linear infinite;
+}
+
+.tank.filling .wave {
+  animation:
+    waveRotate 30s linear infinite,
+    waveFill 4s ease-out forwards;
+}
+
+@keyframes waveRotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(3600deg); }
+}
+
+@keyframes waveFill {
+  0%   { top: 110%; }
+  100% { top: 0%; }
+}
+
+.can-outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* PERCENTAGE TEXT */
+.label {
+  margin-top: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #f8d33a;
+  text-align: center;
+}
