@@ -32,6 +32,17 @@ body.debug .stage{
   left:0 !important; top:0 !important;
   width:100vw !important; height:100vh !important;
 }
+body.debug #stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(243,186,47,0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(243,186,47,0.15) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 99998;
+}
 
 /* Image never intercepts clicks */
 #stationPicture{ position:absolute; inset:0; z-index:0; pointer-events:none; }
