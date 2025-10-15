@@ -8,7 +8,7 @@
 body {
   width: 100%;
   height: 100vh;
-  background-color: #000;
+  background-color: #f8d33a;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,7 +42,7 @@ body {
 
 /* WAVE */
 .wave {
-  background: #f8d33a;
+  background: ##000;
   position: absolute;
   top: 110%;
   left: -50%;
