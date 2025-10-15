@@ -139,19 +139,33 @@ function place(spec, dispW, dispH) {
   });
 }
 /*****************
+/*****************
  * ELECTRIC BUZZ LOOP
  *****************/
 const ambientBuzz = new Audio("electric_buzz.mp3");
-ambientBuzz.loop = true;     // 🔁 loop forever
-ambientBuzz.volume = 0.25;   // adjust volume between 0–1
+ambientBuzz.loop = true;
+ambientBuzz.volume = 0; // start muted
 
-document.addEventListener("DOMContentLoaded", layout);
-if (stationImg.complete) layout(); else stationImg.addEventListener("load", layout);
-window.addEventListener("resize", layout);
-if (window.visualViewport) {
-  visualViewport.addEventListener("resize", layout);
-  visualViewport.addEventListener("scroll", layout);
-}
+// Try autoplay immediately
+ambientBuzz.play().catch(() => {
+  // If blocked, wait for interaction
+  document.addEventListener("click", () => {
+    ambientBuzz.play().catch(() => {});
+  }, { once: true });
+});
+
+// Gradually bring volume up
+let fadeTarget = 0.5;  // how loud you want it finally
+let step = 0.05;
+
+const fadeInterval = setInterval(() => {
+  if (ambientBuzz.volume < fadeTarget) {
+    ambientBuzz.volume = Math.min(fadeTarget, ambientBuzz.volume + step);
+  } else {
+    clearInterval(fadeInterval);
+  }
+}, 100);
+
 
 /*****************
  * FLICKER
