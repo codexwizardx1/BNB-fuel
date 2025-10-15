@@ -25,13 +25,23 @@ setBg(stationImg.currentSrc || stationImg.src);
 stationImg.addEventListener('load', ()=>{ setBg(stationImg.currentSrc || stationImg.src); layout(); });
 
 /*****************
- * HOTSPOTS
+ * HOTSPOTS (store IDs; resolve elements later)
  *****************/
 const HS_LANDSCAPE = {
-  tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7,  rot: -7   },
-  contract:   { el: document.getElementById('hs-contract'),   x: 0.4810, y: 0.6450, w: 0.1020, h: 0.0340, skew: -4,  rot: 5.2  },
-  links:      { el: document.getElementById('hs-links'),      x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5,  rot: 2.2  },
+  tokenomics: { id:'hs-tokenomics', x:0.2000, y:0.6470, w:0.0960, h:0.0360, skew:-7,  rot:-7   },
+  contract:   { id:'hs-contract',   x:0.4810, y:0.6450, w:0.1020, h:0.0340, skew:-4,  rot:5.2  },
+  links:      { id:'hs-links',      x:0.6610, y:0.6710, w:0.0480, h:0.0290, skew:-5,  rot:2.2  },
 };
+
+function hydrate(map){
+  Object.values(map).forEach(s=>{
+    s.el = document.getElementById(s.id) || null;
+    if (!s.el && !s._warned){
+      console.warn(`⚠️ Missing hotspot element: #${s.id}`);
+      s._warned = true;
+    }
+  });
+}
 
 /*****************
  * DETECT PORTRAIT (mobile)
@@ -73,38 +83,41 @@ window.layout = function layout(){
     const remap = v => v ? ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }) : null;
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
-      contract: remap(HS_LANDSCAPE.contract),
-      links: remap(HS_LANDSCAPE.links)
+      contract:   remap(HS_LANDSCAPE.contract),
+      links:      remap(HS_LANDSCAPE.links)
     };
-    Object.values(HS).forEach(spec => place(spec, dispW, dispH, ALIGN_DEBUG));
   } else {
-    // Desktop
-    let dispW, dispH, offX, offY;
+    // Desktop (and forced during Align)
+    const scale = Math.max(vw/iw, vh/ih);
+    const dispW = Math.round(iw * scale);
+    const dispH = Math.round(ih * scale);
+    const offX  = Math.floor((vw - dispW) / 2);
+    const offY  = Math.floor((vh - dispH) / 2);
 
-    if (ALIGN_DEBUG) {
-      dispW = vw; dispH = vh; offX = 0; offY = 0;
-      Object.assign(stage.style, { left:'0px', top:'0px', width: vw+'px', height: vh+'px' });
-    } else {
-      const scale = Math.max(vw/iw, vh/ih);
-      dispW = Math.round(iw * scale);
-      dispH = Math.round(ih * scale);
-      offX  = Math.floor((vw - dispW) / 2);
-      offY  = Math.floor((vh - dispH) / 2);
-      Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
-    }
+    Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
-    Object.values(HS).forEach(spec => place(spec, dispW, dispH, ALIGN_DEBUG));
   }
+
+  // Resolve elements **now**, every layout, then place
+  hydrate(HS);
+  const rect = stage.getBoundingClientRect();
+  const dispW = rect.width;
+  const dispH = rect.height;
+
+  Object.values(HS)
+    .filter(spec => spec && spec.el)  // skip missing safely
+    .forEach(spec => place(spec, dispW, dispH, ALIGN_DEBUG));
 };
 
 function place(spec, dispW, dispH, ALIGN_DEBUG){
-  if (!spec || !spec.el) return; // 👈 Prevents the crash if element is missing
+  // safety: if no el, skip
+  if (!spec || !spec.el) return;
 
   const x = spec.x * dispW;
   const y = spec.y * dispH;
-  let w = spec.w * dispW;
-  let h = spec.h * dispH;
+  let   w = spec.w * dispW;
+  let   h = spec.h * dispH;
 
   if (ALIGN_DEBUG) {
     if (!w || w < 20) w = 140;
@@ -112,6 +125,7 @@ function place(spec, dispW, dispH, ALIGN_DEBUG){
   }
 
   Object.assign(spec.el.style, {
+    position: 'absolute',
     left:  (x - w/2) + 'px',
     top:   (y - h/2) + 'px',
     width:  w + 'px',
@@ -124,7 +138,10 @@ function place(spec, dispW, dispH, ALIGN_DEBUG){
 document.addEventListener('DOMContentLoaded', layout);
 if (stationImg.complete) layout(); else stationImg.addEventListener('load', layout);
 window.addEventListener('resize', layout);
-if (window.visualViewport){ visualViewport.addEventListener('resize', layout); visualViewport.addEventListener('scroll', layout); }
+if (window.visualViewport){
+  visualViewport.addEventListener('resize', layout);
+  visualViewport.addEventListener('scroll', layout);
+}
 
 /*****************
  * FAST FLICKER
@@ -174,9 +191,16 @@ const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
 const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
 
-if (HS_LANDSCAPE.contract.el) HS_LANDSCAPE.contract.el.addEventListener('click', onOpen(mContract));
-if (HS_LANDSCAPE.links.el) HS_LANDSCAPE.links.el.addEventListener('click', onOpen(mLinks));
-if (HS_LANDSCAPE.tokenomics.el) HS_LANDSCAPE.tokenomics.el.addEventListener('click', onOpen(mTok));
+// attach only if element exists
+function wireClicks(){
+  const t = document.getElementById('hs-tokenomics');
+  const c = document.getElementById('hs-contract');
+  const l = document.getElementById('hs-links');
+  if (t) t.addEventListener('click', onOpen(mTok));
+  if (c) c.addEventListener('click', onOpen(mContract));
+  if (l) l.addEventListener('click', onOpen(mLinks));
+}
+document.addEventListener('DOMContentLoaded', wireClicks);
 
 document.querySelectorAll('.modal').forEach(mod=>{
   mod.addEventListener('click', (e)=>{
