@@ -81,7 +81,9 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    const scale = Math.max(vw / iw, vh / ih);
+   // Zoomed out a bit
+const scale = Math.max(vw / iw, vh / ih) * 0.9;   // adjust 0.9 to taste
+
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX = Math.floor((vw - dispW) / 2);
