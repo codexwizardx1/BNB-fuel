@@ -209,7 +209,4 @@ document.querySelectorAll('.modal').forEach(mod=>{
     if(e.target.matches('[data-close]') || e.target.classList.contains('modal-backdrop')) close(mod);
   }, { capture:true });
 });
-document.addEventListener('keydown', (e)=>{
-  if(e.key==='Escape'){ [mContract,mLinks,mTok].forEach(m=>{ if(m.getAttribute('aria-hidden')==='false') close(m); }); }
-});
 
