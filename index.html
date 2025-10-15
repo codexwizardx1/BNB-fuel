@@ -79,17 +79,16 @@
 
   <!-- Alignment HUD + Toggle -->
   <div id="align-hud">
-    <div><b>Alignment Mode</b> — <kbd>A</kbd> toggle or click <b>Align</b></div>
+    <div><b>Alignment Mode</b> — press <kbd>A</kbd> or click <b>Align</b></div>
     <div>Target: <span id="hud-name">tokenomics</span></div>
     <div>Move: <kbd>←</kbd><kbd>→</kbd> / <kbd>↑</kbd><kbd>↓</kbd></div>
     <div>Resize: <kbd>Shift</kbd> + arrows</div>
     <div>Skew: <kbd>[</kbd> <kbd>]</kbd> &nbsp; Rotate: <kbd>;</kbd> <kbd>'</kbd></div>
     <div>Copy JSON: <kbd>C</kbd></div>
-    <div style="margin-top:6px;color:#aaa">Align on DESKTOP. Mobile remaps auto.</div>
   </div>
   <button id="align-toggle" type="button" title="Toggle Alignment (A)">Align</button>
 
-  <!-- Inline toggler: button + A, and forces re-layout + seed -->
+  <!-- Inline toggler -->
   <script>
   (function(){
     function toggleAlign(){
@@ -98,7 +97,6 @@
       const btn = document.getElementById('align-toggle');
       if (btn) btn.setAttribute('aria-pressed', String(window.__ALIGN_DEBUG));
       if (typeof window.layout === 'function') window.layout();
-      if (typeof window.seedHotspots === 'function') window.seedHotspots(); // <- make boxes visible if needed
     }
     document.getElementById('align-toggle')?.addEventListener('click', toggleAlign, {capture:true});
     window.addEventListener('keydown', function(e){
