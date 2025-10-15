@@ -106,8 +106,15 @@ window.layout = function layout(){
 function place(spec, dispW, dispH){
   const x = spec.x * dispW;
   const y = spec.y * dispH;
-  const w = spec.w * dispW;
-  const h = spec.h * dispH;
+  let   w = spec.w * dispW;
+  let   h = spec.h * dispH;
+
+  // Alignment mode: guarantee visible size even if something 0's out
+  if (window.__ALIGN_DEBUG) {
+    if (!w || w < 20) w = 120;
+    if (!h || h < 10) h = 36;
+  }
+
   Object.assign(spec.el.style, {
     left:  (x - w/2) + 'px',
     top:   (y - h/2) + 'px',
@@ -212,7 +219,6 @@ document.addEventListener('keydown', (e)=>{
 (function(){
   const order = ['tokenomics','contract','links'];
   let idx = 0;
-  let DEBUG = false;
 
   const hud = document.getElementById('align-hud');
   const hudName = document.getElementById('hud-name');
@@ -222,8 +228,7 @@ document.addEventListener('keydown', (e)=>{
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
   function updateHUD(){
-    if(!hud) return;
-    hudName.textContent = currentKey();
+    if(hud) hudName.textContent = currentKey();
   }
 
   function copyJSON(){
@@ -242,7 +247,7 @@ document.addEventListener('keydown', (e)=>{
   }
 
   function nudge(e){
-    if(!DEBUG) return;
+    if (!window.__ALIGN_DEBUG) return;
     if (usingPortraitImage && usingPortraitImage()) return; // align only on desktop image
 
     const v = current();
@@ -265,15 +270,14 @@ document.addEventListener('keydown', (e)=>{
   }
 
   function keyHandler(e){
-    if(e.key==='Tab' && document.body.classList.contains('debug')){
+    if(e.key==='Tab' && window.__ALIGN_DEBUG){
       e.preventDefault();
       idx = (idx + (e.shiftKey? order.length-1 : 1)) % order.length;
       updateHUD();
       return;
     }
-    if(e.key==='c' || e.key==='C'){
-      if(document.body.classList.contains('debug')){ e.preventDefault(); copyJSON(); }
-      return;
+    if((e.key==='c' || e.key==='C') && window.__ALIGN_DEBUG){
+      e.preventDefault(); copyJSON(); return;
     }
     nudge(e);
   }
@@ -285,11 +289,7 @@ document.addEventListener('keydown', (e)=>{
     const el = document.getElementById(id);
     if(!el) return;
     el.addEventListener('pointerdown', ()=>{
-      if(document.body.classList.contains('debug')){ idx = i; updateHUD(); }
+      if(window.__ALIGN_DEBUG){ idx = i; updateHUD(); }
     }, true);
   });
-
-  // Keep internal flag in sync
-  const obs = new MutationObserver(()=>{ DEBUG = document.body.classList.contains('debug'); });
-  obs.observe(document.body, { attributes:true, attributeFilter:['class'] });
 })();
