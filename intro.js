@@ -17,7 +17,7 @@ window.addEventListener('load', () => {
       text.textContent = 'FULL';
       setTimeout(() => {
         // redirect to main site
-        window.location.href = 'index.html';
+        window.location.href = 'main.html';
       }, 800);
     }
   }, 40); // ~4 seconds
