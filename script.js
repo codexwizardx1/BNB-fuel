@@ -36,7 +36,7 @@ const HS_LANDSCAPE = {
 /*****************
  * DETECT PORTRAIT (mobile)
  *****************/
-function usingPortraitImage(){
+function traitImage(){
   const src = stationImg.currentSrc || stationImg.src;
   return (stationImg.naturalHeight > stationImg.naturalWidth) ||
          /station_mobile_1080x1920/i.test(src);
@@ -58,7 +58,8 @@ window.layout = function layout(){
 
   const ALIGN_DEBUG = !!window.__ALIGN_DEBUG;
 
-  if (!ALIGN_DEBUG && usingPortraitImage()) {
+  if (usingPortraitImage() && !ALIGN_DEBUG) {
+
     /* PORTRAIT (mobile) */
     const contain = Math.min(vw/iw, vh/ih);
     const cover   = Math.max(vw/iw, vh/ih);
@@ -189,78 +190,14 @@ document.addEventListener('keydown', (e)=>{
 });
 
 /*****************
- * ALIGNMENT MODE (desktop): Tab cycles, arrows move, Shift+arrows resize, [ ] skew, ; ' rotate, C copy
+/*****************
+ * ALIGNMENT MODE TOGGLE (press A)
  *****************/
-(function(){
-  const order = ['tokenomics','contract','links'];
-  let idx = 0;
-
-  const hud = document.getElementById('align-hud');
-  const hudName = document.getElementById('hud-name');
-
-  function currentKey(){ return order[idx]; }
-  function current(){ return HS_LANDSCAPE[currentKey()]; }
-  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-
-  function updateHUD(){ if(hud) hudName.textContent = currentKey(); }
-
-  function copyJSON(){
-    const out = {};
-    order.forEach(k=>{
-      const v = HS_LANDSCAPE[k];
-      out[k] = {
-        x:+v.x.toFixed(4), y:+v.y.toFixed(4),
-        w:+v.w.toFixed(4), h:+v.h.toFixed(4),
-        skew:+Number(v.skew||0).toFixed(2), rot:+Number(v.rot||0).toFixed(2)
-      };
-    });
-    navigator.clipboard.writeText(JSON.stringify(out, null, 2)).catch(()=>{});
-    if (hud) { hud.style.boxShadow = '0 0 0 2px #F3BA2F inset'; setTimeout(()=>hud.style.boxShadow='none', 350); }
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'a' || e.key === 'A') {
+    window.__ALIGN_DEBUG = !window.__ALIGN_DEBUG;
+    document.body.classList.toggle('debug', window.__ALIGN_DEBUG);
+    layout();
   }
+});
 
-  function nudge(e){
-    if (!window.__ALIGN_DEBUG) return;
-
-    const v = current();
-    const baseStep = 0.002; // 0.2%
-    const big = e.shiftKey ? 0.010 : baseStep;
-
-    let handled = true;
-    switch(e.key){
-      case 'ArrowLeft':  if(e.shiftKey) v.w = clamp(v.w - big, 0.01, 1); else v.x = clamp(v.x - baseStep, 0, 1); break;
-      case 'ArrowRight': if(e.shiftKey) v.w = clamp(v.w + big, 0.01, 1); else v.x = clamp(v.x + baseStep, 0, 1); break;
-      case 'ArrowUp':    if(e.shiftKey) v.h = clamp(v.h - big, 0.01, 1); else v.y = clamp(v.y - baseStep, 0, 1); break;
-      case 'ArrowDown':  if(e.shiftKey) v.h = clamp(v.h + big, 0.01, 1); else v.y = clamp(v.y + baseStep, 0, 1); break;
-      case '[': v.skew = (v.skew||0) - 0.5; break;
-      case ']': v.skew = (v.skew||0) + 0.5; break;
-      case ';': v.rot  = (v.rot||0)  - 0.5; break;
-      case "'": v.rot  = (v.rot||0)  + 0.5; break;
-      default: handled = false;
-    }
-    if(handled){ e.preventDefault(); layout(); updateHUD(); }
-  }
-
-  function keyHandler(e){
-    if(e.key==='Tab' && window.__ALIGN_DEBUG){
-      e.preventDefault();
-      idx = (idx + (e.shiftKey? order.length-1 : 1)) % order.length;
-      updateHUD();
-      return;
-    }
-    if((e.key==='c' || e.key==='C') && window.__ALIGN_DEBUG){
-      e.preventDefault(); copyJSON(); return;
-    }
-    nudge(e);
-  }
-  window.addEventListener('keydown', keyHandler, true);
-  document.addEventListener('keydown', keyHandler, true);
-
-  // Select hotspot by clicking it in debug
-  ['hs-tokenomics','hs-contract','hs-links'].forEach((id, i)=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.addEventListener('pointerdown', ()=>{
-      if(window.__ALIGN_DEBUG){ idx = i; updateHUD(); }
-    }, true);
-  });
-})();
