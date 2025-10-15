@@ -138,6 +138,12 @@ function place(spec, dispW, dispH) {
     transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`,
   });
 }
+/*****************
+ * ELECTRIC BUZZ LOOP
+ *****************/
+const ambientBuzz = new Audio("electric_buzz.mp3");
+ambientBuzz.loop = true;     // 🔁 loop forever
+ambientBuzz.volume = 0.25;   // adjust volume between 0–1
 
 document.addEventListener("DOMContentLoaded", layout);
 if (stationImg.complete) layout(); else stationImg.addEventListener("load", layout);
@@ -241,6 +247,11 @@ document.querySelectorAll(".modal").forEach((mod) => {
     { capture: true }
   );
 });
+document.addEventListener("click", () => {
+  if (ambientBuzz.paused) {
+    ambientBuzz.play().catch(() => {});
+  }
+}, { once: true });
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") [mContract, mLinks, mTok].forEach((m) => {
