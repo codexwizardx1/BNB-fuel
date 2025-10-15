@@ -69,9 +69,11 @@ window.layout = function layout(){
 
   if (usingPortraitImage() && !ALIGN_DEBUG) {
     // Portrait (mobile)
-    const contain = Math.min(vw/iw, vh/ih);
-    const cover   = Math.max(vw/iw, vh/ih);
-    const scale   = Math.min(contain * MOBILE_ZOOM, cover);
+   const contain = Math.min(vw/iw, vh/ih);
+const cover   = Math.max(vw/iw, vh/ih);
+
+// 💥 Allow zoom beyond cover:
+const scale   = contain * MOBILE_ZOOM;
 
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
