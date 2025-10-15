@@ -247,3 +247,23 @@ document.addEventListener("keydown", (e) => {
     if (m.getAttribute("aria-hidden") === "false") close(m);
   });
 });
+/*****************
+ * COPY CONTRACT BUTTON
+ *****************/
+const copyBtn = document.getElementById("copyContract");
+if (copyBtn) {
+  copyBtn.addEventListener("click", () => {
+    const textToCopy = CONTRACT_ADDRESS;
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => {
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => {
+          copyBtn.textContent = "Copy";
+        }, 2000);
+      })
+      .catch(() => {
+        alert("Failed to copy address. Please copy manually.");
+      });
+  });
+}
+
