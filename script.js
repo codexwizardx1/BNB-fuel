@@ -1,7 +1,7 @@
 /*****************
  * CONFIG
  *****************/
-const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // <-- replace
+const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // <- replace
 const LINKS = {
   BUY:        "https://example.com/buy",
   CHART:      "https://example.com/chart",
@@ -19,13 +19,12 @@ const stage      = document.getElementById('stage');
 const stationImg = document.getElementById('station');
 const overlay    = document.getElementById('overlay');
 
-/* keep blurred bg synced to active image (from <picture>) */
 function setBg(url){ document.documentElement.style.setProperty('--bg-url', `url("${url}")`); }
 setBg(stationImg.currentSrc || stationImg.src);
 stationImg.addEventListener('load', ()=>{ setBg(stationImg.currentSrc || stationImg.src); layout(); });
 
 /*****************
- * DESKTOP HOTSPOT FRACTIONS (aligned on desktop)
+ * DESKTOP HOTSPOT FRACTIONS (your aligned values)
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7,  rot: -7   },
@@ -34,7 +33,7 @@ const HS_LANDSCAPE = {
 };
 
 /*****************
- * DETECT WHICH IMAGE ACTUALLY LOADED
+ * IMAGE MODE DETECTION
  *****************/
 function usingPortraitImage(){
   const src = stationImg.currentSrc || stationImg.src;
@@ -47,20 +46,21 @@ const MOBILE_ZOOM = 1.22;
 
 /*****************
  * LAYOUT
- * - Desktop (3:2) = COVER (edge-to-edge, your coords)
- * - Portrait mobile (9:16) = CONTAIN + zoom, with hotspot remap
+ * Expose as window.layout so inline toggler can call it.
  *****************/
 let HS = null;
 
-function layout(){
+window.layout = function layout(){
   const vw = window.innerWidth;
   const vh = (window.visualViewport?.height) ? Math.floor(window.visualViewport.height) : window.innerHeight;
 
   const iw = stationImg.naturalWidth  || 1152;
   const ih = stationImg.naturalHeight || 768;
 
-  if (usingPortraitImage()) {
-    // PORTRAIT IMAGE (mobile)
+  const ALIGN_DEBUG = !!window.__ALIGN_DEBUG;
+
+  if (!ALIGN_DEBUG && usingPortraitImage()) {
+    /* ===== PORTRAIT (mobile) ===== */
     const contain = Math.min(vw/iw, vh/ih);
     const cover   = Math.max(vw/iw, vh/ih);
     const scale   = Math.min(contain * MOBILE_ZOOM, cover);
@@ -70,13 +70,13 @@ function layout(){
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    stage.style.left   = offX + 'px';
-    stage.style.top    = offY + 'px';
-    stage.style.width  = dispW + 'px';
-    stage.style.height = dispH + 'px';
+    Object.assign(stage.style, {
+      left: offX + 'px', top: offY + 'px',
+      width: dispW + 'px', height: dispH + 'px'
+    });
 
     // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
-    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }); // x,w same
+    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }); // x,w unchanged
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
       contract:   remap(HS_LANDSCAPE.contract),
@@ -86,44 +86,42 @@ function layout(){
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
 
   } else {
-    // DESKTOP / LANDSCAPE IMAGE — COVER
+    /* ===== DESKTOP / COVER (and forced during Align) ===== */
     const scale = Math.max(vw/iw, vh/ih);
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    stage.style.left   = offX + 'px';
-    stage.style.top    = offY + 'px';
-    stage.style.width  = dispW + 'px';
-    stage.style.height = dispH + 'px';
+    Object.assign(stage.style, {
+      left: offX + 'px', top: offY + 'px',
+      width: dispW + 'px', height: dispH + 'px'
+    });
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
     Object.values(HS).forEach(spec => place(spec, dispW, dispH));
   }
-}
+};
 
 function place(spec, dispW, dispH){
-  const el = spec.el;
   const x = spec.x * dispW;
   const y = spec.y * dispH;
   const w = spec.w * dispW;
   const h = spec.h * dispH;
-  el.style.left = (x - w/2) + 'px';
-  el.style.top  = (y - h/2) + 'px';
-  el.style.width  = w + 'px';
-  el.style.height = h + 'px';
-  el.style.transform = `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`;
+  Object.assign(spec.el.style, {
+    left:  (x - w/2) + 'px',
+    top:   (y - h/2) + 'px',
+    width:  w + 'px',
+    height: h + 'px',
+    transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`
+  });
 }
 
-// Ensure layout runs when DOM is ready + on image load/resize
+/* Run layout */
 document.addEventListener('DOMContentLoaded', layout);
 if (stationImg.complete) layout(); else stationImg.addEventListener('load', layout);
 window.addEventListener('resize', layout);
-if (window.visualViewport){
-  visualViewport.addEventListener('resize', layout);
-  visualViewport.addEventListener('scroll',  layout);
-}
+if (window.visualViewport){ visualViewport.addEventListener('resize', layout); visualViewport.addEventListener('scroll', layout); }
 
 /*****************
  * FAST FLICKER
@@ -174,7 +172,7 @@ document.getElementById('lnk-telegram').href   = LINKS.TELEGRAM;
 document.getElementById('lnk-twitter').href    = LINKS.TWITTER;
 document.getElementById('lnk-whitepaper').href = LINKS.WHITEPAPER;
 
-/* Open/close wiring with capture + pointerdown (can’t be swallowed) */
+/* Open/close wiring (pointerdown + capture so nothing swallows it) */
 const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
 
@@ -202,29 +200,14 @@ document.addEventListener('keydown', (e)=>{
   }
 });
 
-/* Keyboard activation for hotspots */
-['hs-contract','hs-links','hs-tokenomics'].forEach(id=>{
-  const el = document.getElementById(id);
-  el.setAttribute('tabindex','0');
-  el.addEventListener('keydown', (e)=>{
-    if(e.key==='Enter' || e.key===' '){
-      e.preventDefault();
-      if(id==='hs-contract')  open(mContract);
-      if(id==='hs-links')     open(mLinks);
-      if(id==='hs-tokenomics')open(mTok);
-    }
-  }, { capture:true });
-});
-
 /*****************
- * ===== ALIGNMENT MODE v2 =====
- * Toggle: Button (top-right), Key "A", or URL (#align or ?align=1)
+ * ===== ALIGNMENT MODE (desktop) =====
+ * Toggle: button or "A"
  * Target cycle: Tab (tokenomics → contract → links)
- * Nudge:  arrows       (x/y)
+ * Nudge: arrows (x/y)
  * Resize: Shift+arrows (w/h)
- * Skew:   [ / ]
- * Rotate: ; / '
- * Copy:   C  (copies JSON for HS_LANDSCAPE)
+ * Skew: [ / ]    Rotate: ; / '
+ * Copy: C  (copies JSON)
  *****************/
 (function(){
   const order = ['tokenomics','contract','links'];
@@ -233,7 +216,6 @@ document.addEventListener('keydown', (e)=>{
 
   const hud = document.getElementById('align-hud');
   const hudName = document.getElementById('hud-name');
-  const btn = document.getElementById('align-toggle');
 
   function currentKey(){ return order[idx]; }
   function current(){ return HS_LANDSCAPE[currentKey()]; }
@@ -242,19 +224,6 @@ document.addEventListener('keydown', (e)=>{
   function updateHUD(){
     if(!hud) return;
     hudName.textContent = currentKey();
-    btn?.setAttribute('aria-pressed', String(DEBUG));
-  }
-
-  function applyAndRefresh(){
-    if (usingPortraitImage && usingPortraitImage()) return; // align only on desktop image
-    layout();
-    updateHUD();
-  }
-
-  function toggleDebug(force){
-    DEBUG = typeof force === 'boolean' ? force : !DEBUG;
-    document.body.classList.toggle('debug', DEBUG);
-    updateHUD();
   }
 
   function copyJSON(){
@@ -274,10 +243,10 @@ document.addEventListener('keydown', (e)=>{
 
   function nudge(e){
     if(!DEBUG) return;
-    if (usingPortraitImage && usingPortraitImage()) return;
+    if (usingPortraitImage && usingPortraitImage()) return; // align only on desktop image
 
     const v = current();
-    const baseStep = 0.002;      // 0.2% per tap
+    const baseStep = 0.002; // 0.2%
     const big = e.shiftKey ? 0.010 : baseStep;
 
     let handled = true;
@@ -292,38 +261,26 @@ document.addEventListener('keydown', (e)=>{
       case "'": v.rot  = (v.rot||0)  + 0.5; break;
       default: handled = false;
     }
-    if(handled){ e.preventDefault(); applyAndRefresh(); }
+    if(handled){ e.preventDefault(); layout(); updateHUD(); }
   }
 
   function keyHandler(e){
-    if(e.key==='a' || e.key==='A'){ toggleDebug(); return; }
-    if(!DEBUG) return;
-
-    if(e.key==='Tab'){
+    if(e.key==='Tab' && document.body.classList.contains('debug')){
       e.preventDefault();
       idx = (idx + (e.shiftKey? order.length-1 : 1)) % order.length;
       updateHUD();
       return;
     }
-    if(e.key==='c' || e.key==='C'){ e.preventDefault(); copyJSON(); return; }
+    if(e.key==='c' || e.key==='C'){
+      if(document.body.classList.contains('debug')){ e.preventDefault(); copyJSON(); }
+      return;
+    }
     nudge(e);
   }
   window.addEventListener('keydown', keyHandler, true);
   document.addEventListener('keydown', keyHandler, true);
 
-  // Button toggle
-  btn?.addEventListener('click', ()=>toggleDebug(), {capture:true});
-
-  // URL toggles: #align or ?align=1
-  function autoEnableFromURL(){
-    const hash = (location.hash||'').toLowerCase();
-    const params = new URLSearchParams(location.search);
-    if(hash.includes('align') || params.get('align')==='1'){ toggleDebug(true); }
-  }
-  document.addEventListener('DOMContentLoaded', autoEnableFromURL);
-  autoEnableFromURL();
-
-  // Click a hotspot to select it in debug
+  // Select hotspot by clicking it in debug
   ['hs-tokenomics','hs-contract','hs-links'].forEach((id, i)=>{
     const el = document.getElementById(id);
     if(!el) return;
@@ -331,4 +288,8 @@ document.addEventListener('keydown', (e)=>{
       if(document.body.classList.contains('debug')){ idx = i; updateHUD(); }
     }, true);
   });
+
+  // Keep internal flag in sync
+  const obs = new MutationObserver(()=>{ DEBUG = document.body.classList.contains('debug'); });
+  obs.observe(document.body, { attributes:true, attributeFilter:['class'] });
 })();
