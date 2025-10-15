@@ -89,7 +89,7 @@
   </div>
   <button id="align-toggle" type="button" title="Toggle Alignment (A)">Align</button>
 
-  <!-- Inline toggler: guarantees A key & button work, and forces re-layout -->
+  <!-- Inline toggler: button + A, and forces re-layout + seed -->
   <script>
   (function(){
     function toggleAlign(){
@@ -98,6 +98,7 @@
       const btn = document.getElementById('align-toggle');
       if (btn) btn.setAttribute('aria-pressed', String(window.__ALIGN_DEBUG));
       if (typeof window.layout === 'function') window.layout();
+      if (typeof window.seedHotspots === 'function') window.seedHotspots(); // <- make boxes visible if needed
     }
     document.getElementById('align-toggle')?.addEventListener('click', toggleAlign, {capture:true});
     window.addEventListener('keydown', function(e){
