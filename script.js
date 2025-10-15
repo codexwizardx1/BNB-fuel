@@ -52,13 +52,13 @@ window.layout = function layout(){
   const vw = window.innerWidth;
   const vh = (window.visualViewport?.height) ? Math.floor(window.visualViewport.height) : window.innerHeight;
 
-  // Use image natural size if present, else desktop fallback
   const iw = stationImg.naturalWidth  || 1152;
   const ih = stationImg.naturalHeight || 768;
 
   const ALIGN_DEBUG = !!window.__ALIGN_DEBUG;
 
-  if (!ALIGN_DEBUG && usingPortraitImage()) {
+  // 🔸 FIXED CONDITION:
+  if (usingPortraitImage() && !ALIGN_DEBUG) {
     /* PORTRAIT (mobile) */
     const contain = Math.min(vw/iw, vh/ih);
     const cover   = Math.max(vw/iw, vh/ih);
@@ -105,7 +105,6 @@ function place(spec, dispW, dispH, ALIGN_DEBUG){
   let   w = spec.w * dispW;
   let   h = spec.h * dispH;
 
-  // In Align mode, guarantee visible size even if something collapses
   if (ALIGN_DEBUG) {
     if (!w || w < 20) w = 140;
     if (!h || h < 10) h = 40;
@@ -170,7 +169,6 @@ document.getElementById('lnk-telegram').href   = LINKS.TELEGRAM;
 document.getElementById('lnk-twitter').href    = LINKS.TWITTER;
 document.getElementById('lnk-whitepaper').href = LINKS.WHITEPAPER;
 
-/* Open/close wiring */
 const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
 const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
@@ -189,7 +187,7 @@ document.addEventListener('keydown', (e)=>{
 });
 
 /*****************
- * ALIGNMENT MODE (desktop): Tab cycles, arrows move, Shift+arrows resize, [ ] skew, ; ' rotate, C copy
+ * ALIGNMENT MODE (desktop)
  *****************/
 (function(){
   const order = ['tokenomics','contract','links'];
@@ -201,8 +199,16 @@ document.addEventListener('keydown', (e)=>{
   function currentKey(){ return order[idx]; }
   function current(){ return HS_LANDSCAPE[currentKey()]; }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-
   function updateHUD(){ if(hud) hudName.textContent = currentKey(); }
+
+  // ✅ Press A to toggle alignment mode
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'a' || e.key === 'A') {
+      window.__ALIGN_DEBUG = !window.__ALIGN_DEBUG;
+      document.body.classList.toggle('debug', window.__ALIGN_DEBUG);
+      layout();
+    }
+  });
 
   function copyJSON(){
     const out = {};
@@ -220,9 +226,8 @@ document.addEventListener('keydown', (e)=>{
 
   function nudge(e){
     if (!window.__ALIGN_DEBUG) return;
-
     const v = current();
-    const baseStep = 0.002; // 0.2%
+    const baseStep = 0.002;
     const big = e.shiftKey ? 0.010 : baseStep;
 
     let handled = true;
@@ -252,6 +257,7 @@ document.addEventListener('keydown', (e)=>{
     }
     nudge(e);
   }
+
   window.addEventListener('keydown', keyHandler, true);
   document.addEventListener('keydown', keyHandler, true);
 
