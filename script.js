@@ -57,7 +57,7 @@ window.layout = function layout(){
 
   const ALIGN_DEBUG = !!window.__ALIGN_DEBUG;
 
-  // 🔸 FIXED CONDITION:
+  // 🔸 FIXED CONDITION
   if (usingPortraitImage() && !ALIGN_DEBUG) {
     /* PORTRAIT (mobile) */
     const contain = Math.min(vw/iw, vh/ih);
@@ -72,7 +72,7 @@ window.layout = function layout(){
     Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
 
     // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
-    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }); // x,w unchanged
+    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
     HS = { tokenomics: remap(HS_LANDSCAPE.tokenomics), contract: remap(HS_LANDSCAPE.contract), links: remap(HS_LANDSCAPE.links) };
     Object.values(HS).forEach(spec => place(spec, dispW, dispH, ALIGN_DEBUG));
 
@@ -81,11 +81,9 @@ window.layout = function layout(){
     let dispW, dispH, offX, offY;
 
     if (ALIGN_DEBUG) {
-      // FORCE: fill viewport so boxes always show
       dispW = vw; dispH = vh; offX = 0; offY = 0;
       Object.assign(stage.style, { left:'0px', top:'0px', width: vw+'px', height: vh+'px' });
     } else {
-      // Normal cover math
       const scale = Math.max(vw/iw, vh/ih);
       dispW = Math.round(iw * scale);
       dispH = Math.round(ih * scale);
@@ -100,6 +98,7 @@ window.layout = function layout(){
 };
 
 function place(spec, dispW, dispH, ALIGN_DEBUG){
+  if (!spec.el) return; // ✅ prevents crash
   const x = spec.x * dispW;
   const y = spec.y * dispH;
   let   w = spec.w * dispW;
@@ -111,6 +110,7 @@ function place(spec, dispW, dispH, ALIGN_DEBUG){
   }
 
   Object.assign(spec.el.style, {
+    position: "absolute",
     left:  (x - w/2) + 'px',
     top:   (y - h/2) + 'px',
     width:  w + 'px',
@@ -169,14 +169,14 @@ document.getElementById('lnk-telegram').href   = LINKS.TELEGRAM;
 document.getElementById('lnk-twitter').href    = LINKS.TWITTER;
 document.getElementById('lnk-whitepaper').href = LINKS.WHITEPAPER;
 
+/* ✅ Use CLICK instead of pointerdown */
 const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
 const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
 
 document.getElementById('hs-contract').addEventListener('click', onOpen(mContract));
-document.getElementById('hs-links')   .addEventListener('click', onOpen(mLinks));
+document.getElementById('hs-links').addEventListener('click', onOpen(mLinks));
 document.getElementById('hs-tokenomics').addEventListener('click', onOpen(mTok));
-
 
 document.querySelectorAll('.modal').forEach(mod=>{
   mod.addEventListener('click', (e)=>{
@@ -266,7 +266,7 @@ document.addEventListener('keydown', (e)=>{
   ['hs-tokenomics','hs-contract','hs-links'].forEach((id, i)=>{
     const el = document.getElementById(id);
     if(!el) return;
-    el.addEventListener('pointerdown', ()=>{
+    el.addEventListener('click', ()=>{
       if(window.__ALIGN_DEBUG){ idx = i; updateHUD(); }
     }, true);
   });
