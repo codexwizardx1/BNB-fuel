@@ -37,16 +37,16 @@ body {
   background-color: #F3BA2F;
   position: absolute;
   top: 110%;
-  height: 200%;
-  width: 200%;
-  border-radius: 38%;
-  left: -50%;
-  animation: wave 30s linear infinite;
+  height: 220%;
+  width: 220%;
+  border-radius: 45%;
+  left: -60%;
+  animation: wave 6s linear infinite;
   transition: top 4s ease-in-out;
 }
 
 @keyframes wave {
-  0% { transform: rotate(0deg); }
+  0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
