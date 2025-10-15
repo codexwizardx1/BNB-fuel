@@ -92,12 +92,27 @@ body{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
 
-/* ===== ALIGNMENT MODE visuals ===== */
+/* ===== ALIGNMENT MODE: force-visible, labeled, and on top ===== */
 body.debug .hotspot{
-  outline: 3px dashed rgba(243,186,47,1);
-  background: rgba(243,186,47,.18);
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  z-index:99999 !important;
+  outline:3px dashed rgba(243,186,47,1);
+  background:rgba(243,186,47,.18);
 }
-body.debug .stage{ outline:2px solid rgba(243,186,47,.7); }
+body.debug .stage{ outline:2px solid rgba(243,186,47,.75); }
+
+body.debug #hs-tokenomics::after,
+body.debug #hs-contract::after,
+body.debug #hs-links::after{
+  position:absolute; left:0; top:-18px;
+  font:12px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:#F3BA2F; text-shadow:0 1px 0 #000;
+}
+body.debug #hs-tokenomics::after{ content:'tokenomics'; }
+body.debug #hs-contract::after{   content:'contract'; }
+body.debug #hs-links::after{      content:'links'; }
 
 /* Align HUD */
 #align-hud{
