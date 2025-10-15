@@ -25,7 +25,7 @@ setBg(stationImg.currentSrc || stationImg.src);
 stationImg.addEventListener('load', ()=>{ setBg(stationImg.currentSrc || stationImg.src); layout(); });
 
 /*****************
- * DESKTOP FRACTIONS (starting values)
+ * HOTSPOTS
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7,  rot: -7   },
@@ -44,7 +44,7 @@ function usingPortraitImage(){
 const MOBILE_ZOOM = 1.22;
 
 /*****************
- * LAYOUT (exposed for Align toggle)
+ * LAYOUT
  *****************/
 let HS = null;
 
@@ -57,9 +57,8 @@ window.layout = function layout(){
 
   const ALIGN_DEBUG = !!window.__ALIGN_DEBUG;
 
-  // 🔸 FIXED CONDITION
   if (usingPortraitImage() && !ALIGN_DEBUG) {
-    /* PORTRAIT (mobile) */
+    // Portrait (mobile)
     const contain = Math.min(vw/iw, vh/ih);
     const cover   = Math.max(vw/iw, vh/ih);
     const scale   = Math.min(contain * MOBILE_ZOOM, cover);
@@ -71,13 +70,15 @@ window.layout = function layout(){
 
     Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
 
-    // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
-    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
-    HS = { tokenomics: remap(HS_LANDSCAPE.tokenomics), contract: remap(HS_LANDSCAPE.contract), links: remap(HS_LANDSCAPE.links) };
+    const remap = v => v ? ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }) : null;
+    HS = {
+      tokenomics: remap(HS_LANDSCAPE.tokenomics),
+      contract: remap(HS_LANDSCAPE.contract),
+      links: remap(HS_LANDSCAPE.links)
+    };
     Object.values(HS).forEach(spec => place(spec, dispW, dispH, ALIGN_DEBUG));
-
   } else {
-    /* DESKTOP COVER (and forced during Align) */
+    // Desktop
     let dispW, dispH, offX, offY;
 
     if (ALIGN_DEBUG) {
@@ -98,11 +99,12 @@ window.layout = function layout(){
 };
 
 function place(spec, dispW, dispH, ALIGN_DEBUG){
-  if (!spec.el) return; // ✅ prevents crash
+  if (!spec || !spec.el) return; // 👈 Prevents the crash if element is missing
+
   const x = spec.x * dispW;
   const y = spec.y * dispH;
-  let   w = spec.w * dispW;
-  let   h = spec.h * dispH;
+  let w = spec.w * dispW;
+  let h = spec.h * dispH;
 
   if (ALIGN_DEBUG) {
     if (!w || w < 20) w = 140;
@@ -110,7 +112,6 @@ function place(spec, dispW, dispH, ALIGN_DEBUG){
   }
 
   Object.assign(spec.el.style, {
-    position: "absolute",
     left:  (x - w/2) + 'px',
     top:   (y - h/2) + 'px',
     width:  w + 'px',
@@ -169,14 +170,13 @@ document.getElementById('lnk-telegram').href   = LINKS.TELEGRAM;
 document.getElementById('lnk-twitter').href    = LINKS.TWITTER;
 document.getElementById('lnk-whitepaper').href = LINKS.WHITEPAPER;
 
-/* ✅ Use CLICK instead of pointerdown */
 const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
 const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
 
-document.getElementById('hs-contract').addEventListener('click', onOpen(mContract));
-document.getElementById('hs-links').addEventListener('click', onOpen(mLinks));
-document.getElementById('hs-tokenomics').addEventListener('click', onOpen(mTok));
+if (HS_LANDSCAPE.contract.el) HS_LANDSCAPE.contract.el.addEventListener('click', onOpen(mContract));
+if (HS_LANDSCAPE.links.el) HS_LANDSCAPE.links.el.addEventListener('click', onOpen(mLinks));
+if (HS_LANDSCAPE.tokenomics.el) HS_LANDSCAPE.tokenomics.el.addEventListener('click', onOpen(mTok));
 
 document.querySelectorAll('.modal').forEach(mod=>{
   mod.addEventListener('click', (e)=>{
@@ -202,7 +202,6 @@ document.addEventListener('keydown', (e)=>{
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
   function updateHUD(){ if(hud) hudName.textContent = currentKey(); }
 
-  // ✅ Press A to toggle alignment mode
   document.addEventListener('keydown', (e) => {
     if (e.key === 'a' || e.key === 'A') {
       window.__ALIGN_DEBUG = !window.__ALIGN_DEBUG;
@@ -262,7 +261,6 @@ document.addEventListener('keydown', (e)=>{
   window.addEventListener('keydown', keyHandler, true);
   document.addEventListener('keydown', keyHandler, true);
 
-  // Select hotspot by clicking it in debug
   ['hs-tokenomics','hs-contract','hs-links'].forEach((id, i)=>{
     const el = document.getElementById(id);
     if(!el) return;
