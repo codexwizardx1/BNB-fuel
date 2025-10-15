@@ -81,13 +81,23 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
- // Force full-width, zoomed-out height
-const scale = (vw / iw) * 0.9;  // always stretch to full width
-const dispW = Math.round(iw * scale);
-const dispH = Math.round(ih * scale);
-const offX  = 0;
-const offY  = Math.floor((vh - dispH) / 2);
-Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
+// Force full width, center vertically
+const scaleW = vw / iw;           // always match viewport width
+const scale = scaleW * 0.9;       // 0.9 makes it appear "zoomed out" vertically
+
+const dispW = Math.round(iw * scaleW);  // full width
+const dispH = Math.round(ih * scale);   // slightly reduced height
+
+const offX = 0;                                 // flush to left edge
+const offY = Math.floor((vh - dispH) / 2);      // center vertically
+
+Object.assign(stage.style, {
+  left: offX + 'px',
+  top: offY + 'px',
+  width: dispW + 'px',
+  height: dispH + 'px'
+});
+
 
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
