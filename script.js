@@ -172,7 +172,7 @@ document.getElementById("tok-supply").textContent = TOKENOMICS.supply;
 document.getElementById("tok-tax").textContent = TOKENOMICS.tax;
 document.getElementById("tok-liq").textContent = TOKENOMICS.liquidity;
 document.getElementById("contract-value").textContent = CONTRACT_ADDRESS;
-document.getElementById("tok-addr").textContent = CONTRACT_ADDRESS;
+
 
 document.getElementById("lnk-buy").href = LINKS.BUY;
 document.getElementById("lnk-chart").href = LINKS.CHART;
