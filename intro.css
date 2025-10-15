@@ -20,43 +20,46 @@ body {
   align-items: center;
 }
 
-/* Outer container */
+/* Container matching your jerrycan image size */
 .can-wrapper {
   position: relative;
-  width: 180px;
-  height: 250px;
+  width: 200px;      /* adjust this to your image size */
+  height: 250px;     /* adjust this to your image size */
 }
 
-/* Tank shape — Jerry can */
-.tank,
-.tank-outline {
+/* Wave container behind the image */
+.tank {
   position: absolute;
   top: 0;
   left: 0;
-  width: 180px;
-  height: 250px;
-  clip-path: polygon(
-    15% 0%, 55% 0%, 60% 5%, 90% 5%, 90% 20%, 
-    80% 20%, 80% 95%, 20% 95%, 20% 20%, 
-    10% 20%, 10% 5%, 45% 5%, 50% 0%
-  );
-}
-
-.tank {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: #000;
+  mask-image: url('jerrycan.png');
+  -webkit-mask-image: url('jerrycan.png');
+  mask-size: cover;
+  -webkit-mask-size: cover;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+  background: transparent;
   z-index: 1;
 }
 
-/* Outline stays visible at all times */
-.tank-outline {
-  border: 3px solid #F3BA2F;
-  box-shadow: 0 0 15px #F3BA2F;
+/* Jerry can outline image (on top) */
+.can-outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
   pointer-events: none;
-  z-index: 3;
 }
 
-/* Wave that fills up */
+/* Wave itself */
 .wave {
   background: #F3BA2F;
   position: absolute;
@@ -66,17 +69,14 @@ body {
   height: 200%;
   border-radius: 38%;
   transform: rotate(0deg);
-  animation:
-    waveRotate 30s linear infinite;
+  animation: waveRotate 30s linear infinite;
 }
 
-/* wave rotates forever */
 @keyframes waveRotate {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(3600deg); }
 }
 
-/* when filling starts */
 .tank.filling .wave {
   animation:
     waveRotate 30s linear infinite,
@@ -88,7 +88,6 @@ body {
   100% { top: 0%; }
 }
 
-/* Text label */
 .label {
   margin-top: 20px;
   color: #F3BA2F;
