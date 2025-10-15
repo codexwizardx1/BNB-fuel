@@ -8,25 +8,52 @@
 body {
   width: 100%;
   height: 100vh;
-  background-color: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  overflow: hidden;
   font-family: system-ui, sans-serif;
-  color: #fff;
 }
 
-/* WRAPPER — scale down size */
+/* BASE LAYER (underneath) */
+#baseLayer {
+  position: fixed;
+  inset: 0;
+  background-color: #f8d33a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 0;
+}
+
+.logo-reveal {
+  width: 200px;
+  opacity: 1;
+}
+
+/* INTRO LAYER (on top) */
+#introLayer {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 5;
+  transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+#introLayer.slide-up {
+  transform: translateY(-100%);
+}
+
+/* CAN + FILL ANIMATION */
 .can-wrapper {
   position: relative;
-  width: 300px;     /* ⬅️ was 1080px — reduced */
-  height: 300px;    /* keep it square since your image is square */
-  max-width: 80vw;  /* make it responsive */
+  width: 300px;
+  height: 300px;
+  max-width: 80vw;
   max-height: 80vw;
 }
 
-/* TANK — mask stays scaled with wrapper */
 .tank {
   position: absolute;
   inset: 0;
@@ -40,9 +67,8 @@ body {
   z-index: 1;
 }
 
-/* WAVE */
 .wave {
-  background: #f8d33a;
+  background: #000;
   position: absolute;
   top: 110%;
   left: -50%;
@@ -69,7 +95,6 @@ body {
   100% { top: 0%; }
 }
 
-/* OUTLINE — scaled with wrapper */
 .can-outline {
   position: absolute;
   inset: 0;
@@ -80,11 +105,11 @@ body {
   z-index: 2;
 }
 
-/* Percentage text */
-#fuelText {
+/* PERCENTAGE TEXT */
+.label {
   margin-top: 20px;
   font-size: 22px;
   font-weight: bold;
-  color: #F3BA2F;
+  color: #f8d33a;
   text-align: center;
 }
