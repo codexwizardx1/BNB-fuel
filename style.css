@@ -168,4 +168,12 @@ body.debug #align-hud{ display:block; }
 .stage {
   z-index: 9998 !important;
 }
+/* --- TEMP CLICK DEBUG --- */
+#stationPicture, .dark-overlay { pointer-events: none !important; }
+.stage { z-index: 9998 !important; }
+.hotspot{
+  z-index: 2147483647 !important;   /* max */
+  background: rgba(255,255,0,.25);   /* temp: you can see them */
+  outline: 2px dashed yellow;        /* temp: you can see them */
+}
 
