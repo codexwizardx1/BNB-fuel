@@ -159,4 +159,13 @@ body.debug #align-hud{ display:block; }
 .hotspot {
   z-index: 9999 !important;
 }
+.hotspot {
+  background: rgba(255, 255, 0, 0.3) !important; /* make it visible */
+  outline: 2px dashed yellow !important;
+  z-index: 9999 !important;
+}
+
+.stage {
+  z-index: 9998 !important;
+}
 
