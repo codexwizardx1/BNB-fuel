@@ -17,16 +17,16 @@ body {
   color: #fff;
 }
 
-/* WRAPPER — matches image dimensions */
+/* WRAPPER — match image dimensions */
 .can-wrapper {
   position: relative;
   width: 1080px;
   height: 1080px;
-  max-width: 90vw;     /* responsive scale */
-  max-height: 90vw;    /* keep aspect ratio on smaller screens */
+  max-width: 90vw;    /* makes it scale down nicely on mobile */
+  max-height: 90vw;
 }
 
-/* FILL AREA — mask must match the outline exactly */
+/* TANK — use mask for wave */
 .tank {
   position: absolute;
   inset: 0;
@@ -40,7 +40,7 @@ body {
   z-index: 1;
 }
 
-/* WAVE EFFECT */
+/* WAVE — fills from bottom up */
 .wave {
   background: #F3BA2F;
   position: absolute;
@@ -69,7 +69,7 @@ body {
   100% { top: 0%; }
 }
 
-/* OUTLINE stays perfectly on top */
+/* OUTLINE — your visible jerrycan image */
 .can-outline {
   position: absolute;
   inset: 0;
@@ -86,4 +86,5 @@ body {
   font-size: 24px;
   font-weight: bold;
   color: #F3BA2F;
+  text-align: center;
 }
