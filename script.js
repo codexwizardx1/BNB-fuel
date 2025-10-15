@@ -19,12 +19,13 @@ const stage      = document.getElementById('stage');
 const stationImg = document.getElementById('station');
 const overlay    = document.getElementById('overlay');
 
+/* Sync blurred bg */
 function setBg(url){ document.documentElement.style.setProperty('--bg-url', `url("${url}")`); }
 setBg(stationImg.currentSrc || stationImg.src);
 stationImg.addEventListener('load', ()=>{ setBg(stationImg.currentSrc || stationImg.src); layout(); });
 
 /*****************
- * DESKTOP HOTSPOT FRACTIONS (your aligned values)
+ * DESKTOP FRACTIONS (starting values)
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { el: document.getElementById('hs-tokenomics'), x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7,  rot: -7   },
@@ -33,44 +34,17 @@ const HS_LANDSCAPE = {
 };
 
 /*****************
- * IMAGE MODE DETECTION
+ * DETECT PORTRAIT (mobile)
  *****************/
 function usingPortraitImage(){
   const src = stationImg.currentSrc || stationImg.src;
   return (stationImg.naturalHeight > stationImg.naturalWidth) ||
          /station_mobile_1080x1920/i.test(src);
 }
-
-/* Mobile zoom */
 const MOBILE_ZOOM = 1.22;
 
 /*****************
- * SEED: ensure boxes appear in Align mode even before perfect sizing
- *****************/
-window.seedHotspots = function seedHotspots(){
-  if (!window.__ALIGN_DEBUG) return;
-  const els = [
-    document.getElementById('hs-tokenomics'),
-    document.getElementById('hs-contract'),
-    document.getElementById('hs-links')
-  ];
-  // If first hotspot has tiny/zero size, seed all three
-  const needSeed = !els[0] || (els[0].offsetWidth < 4 || els[0].offsetHeight < 4);
-  if (!needSeed) return;
-  els.forEach((el, i)=>{
-    if(!el) return;
-    Object.assign(el.style, {
-      left:  (20 + i*220) + 'px',
-      top:   '20px',
-      width: '200px',
-      height:'60px',
-      transform: 'none'
-    });
-  });
-};
-
-/*****************
- * LAYOUT (exposed for inline toggler)
+ * LAYOUT (exposed for Align toggle)
  *****************/
 let HS = null;
 
@@ -78,13 +52,14 @@ window.layout = function layout(){
   const vw = window.innerWidth;
   const vh = (window.visualViewport?.height) ? Math.floor(window.visualViewport.height) : window.innerHeight;
 
+  // Use image natural size if present, else desktop fallback
   const iw = stationImg.naturalWidth  || 1152;
   const ih = stationImg.naturalHeight || 768;
 
   const ALIGN_DEBUG = !!window.__ALIGN_DEBUG;
 
   if (!ALIGN_DEBUG && usingPortraitImage()) {
-    /* ===== PORTRAIT (mobile) ===== */
+    /* PORTRAIT (mobile) */
     const contain = Math.min(vw/iw, vh/ih);
     const cover   = Math.max(vw/iw, vh/ih);
     const scale   = Math.min(contain * MOBILE_ZOOM, cover);
@@ -94,51 +69,46 @@ window.layout = function layout(){
     const offX  = Math.floor((vw - dispW) / 2);
     const offY  = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, {
-      left: offX + 'px', top: offY + 'px',
-      width: dispW + 'px', height: dispH + 'px'
-    });
+    Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
 
     // Remap desktop fractions to portrait (center 1080×720 inside 1080×1920)
-    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h });
-    HS = {
-      tokenomics: remap(HS_LANDSCAPE.tokenomics),
-      contract:   remap(HS_LANDSCAPE.contract),
-      links:      remap(HS_LANDSCAPE.links),
-    };
+    const remap = v => ({ ...v, y: 0.3125 + 0.375*v.y, h: 0.375*v.h }); // x,w unchanged
+    HS = { tokenomics: remap(HS_LANDSCAPE.tokenomics), contract: remap(HS_LANDSCAPE.contract), links: remap(HS_LANDSCAPE.links) };
+    Object.values(HS).forEach(spec => place(spec, dispW, dispH, ALIGN_DEBUG));
 
-    Object.values(HS).forEach(spec => place(spec, dispW, dispH));
   } else {
-    /* ===== DESKTOP / COVER (and forced during Align) ===== */
-    const scale = Math.max(vw/iw, vh/ih);
-    const dispW = Math.round(iw * scale);
-    const dispH = Math.round(ih * scale);
-    const offX  = Math.floor((vw - dispW) / 2);
-    const offY  = Math.floor((vh - dispH) / 2);
+    /* DESKTOP COVER (and forced during Align) */
+    let dispW, dispH, offX, offY;
 
-    Object.assign(stage.style, {
-      left: offX + 'px', top: offY + 'px',
-      width: dispW + 'px', height: dispH + 'px'
-    });
+    if (ALIGN_DEBUG) {
+      // FORCE: fill viewport so boxes always show
+      dispW = vw; dispH = vh; offX = 0; offY = 0;
+      Object.assign(stage.style, { left:'0px', top:'0px', width: vw+'px', height: vh+'px' });
+    } else {
+      // Normal cover math
+      const scale = Math.max(vw/iw, vh/ih);
+      dispW = Math.round(iw * scale);
+      dispH = Math.round(ih * scale);
+      offX  = Math.floor((vw - dispW) / 2);
+      offY  = Math.floor((vh - dispH) / 2);
+      Object.assign(stage.style, { left: offX+'px', top: offY+'px', width: dispW+'px', height: dispH+'px' });
+    }
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
-    Object.values(HS).forEach(spec => place(spec, dispW, dispH));
+    Object.values(HS).forEach(spec => place(spec, dispW, dispH, ALIGN_DEBUG));
   }
-
-  // If in Align mode and boxes ended up 0×0 for any reason, seed them
-  window.seedHotspots();
 };
 
-function place(spec, dispW, dispH){
+function place(spec, dispW, dispH, ALIGN_DEBUG){
   const x = spec.x * dispW;
   const y = spec.y * dispH;
   let   w = spec.w * dispW;
   let   h = spec.h * dispH;
 
-  // Alignment mode: guarantee visible size even if something 0's out
-  if (window.__ALIGN_DEBUG) {
-    if (!w || w < 20) w = 120;
-    if (!h || h < 10) h = 36;
+  // In Align mode, guarantee visible size even if something collapses
+  if (ALIGN_DEBUG) {
+    if (!w || w < 20) w = 140;
+    if (!h || h < 10) h = 40;
   }
 
   Object.assign(spec.el.style, {
@@ -159,10 +129,7 @@ if (window.visualViewport){ visualViewport.addEventListener('resize', layout); v
 /*****************
  * FAST FLICKER
  *****************/
-function setOff(isOff){
-  stationImg.classList.toggle('off', isOff);
-  overlay.classList.toggle('off', isOff);
-}
+function setOff(isOff){ stationImg.classList.toggle('off', isOff); overlay.classList.toggle('off', isOff); }
 let flickerTimer=null, burstTimer=null;
 function stopFlicker(){ clearTimeout(flickerTimer); flickerTimer=null; clearInterval(burstTimer); burstTimer=null; }
 function startFlicker(){
@@ -179,9 +146,7 @@ function startFlicker(){
   }, 60);
 }
 startFlicker();
-document.addEventListener('visibilitychange', ()=>{
-  if(!document.hidden && !flickerTimer && !burstTimer) startFlicker();
-});
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && !flickerTimer && !burstTimer) startFlicker(); });
 
 /*****************
  * MODALS + DATA
@@ -205,37 +170,26 @@ document.getElementById('lnk-telegram').href   = LINKS.TELEGRAM;
 document.getElementById('lnk-twitter').href    = LINKS.TWITTER;
 document.getElementById('lnk-whitepaper').href = LINKS.WHITEPAPER;
 
-/* Open/close wiring (pointerdown + capture so nothing swallows it) */
+/* Open/close wiring */
 const open  = m => m.setAttribute('aria-hidden','false');
 const close = m => m.setAttribute('aria-hidden','true');
-
 const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
 
-document.getElementById('hs-contract')
-  .addEventListener('pointerdown', onOpen(mContract), { capture:true });
-document.getElementById('hs-links')
-  .addEventListener('pointerdown', onOpen(mLinks), { capture:true });
-document.getElementById('hs-tokenomics')
-  .addEventListener('pointerdown', onOpen(mTok), { capture:true });
+document.getElementById('hs-contract').addEventListener('pointerdown', onOpen(mContract), { capture:true });
+document.getElementById('hs-links')   .addEventListener('pointerdown', onOpen(mLinks),    { capture:true });
+document.getElementById('hs-tokenomics').addEventListener('pointerdown', onOpen(mTok),    { capture:true });
 
 document.querySelectorAll('.modal').forEach(mod=>{
   mod.addEventListener('click', (e)=>{
-    if(e.target.matches('[data-close]') || e.target.classList.contains('modal-backdrop')){
-      close(mod);
-    }
+    if(e.target.matches('[data-close]') || e.target.classList.contains('modal-backdrop')) close(mod);
   }, { capture:true });
 });
 document.addEventListener('keydown', (e)=>{
-  if(e.key==='Escape'){
-    [mContract,mLinks,mTok].forEach(m=>{
-      if(m.getAttribute('aria-hidden')==='false') close(m);
-    });
-  }
+  if(e.key==='Escape'){ [mContract,mLinks,mTok].forEach(m=>{ if(m.getAttribute('aria-hidden')==='false') close(m); }); }
 });
 
 /*****************
- * ALIGNMENT MODE (desktop)
- * Tab cycles target, arrows move, Shift+arrows resize, [ ] skew, ; ' rotate, C copies JSON
+ * ALIGNMENT MODE (desktop): Tab cycles, arrows move, Shift+arrows resize, [ ] skew, ; ' rotate, C copy
  *****************/
 (function(){
   const order = ['tokenomics','contract','links'];
@@ -266,7 +220,6 @@ document.addEventListener('keydown', (e)=>{
 
   function nudge(e){
     if (!window.__ALIGN_DEBUG) return;
-    if (usingPortraitImage && usingPortraitImage()) return; // desktop only
 
     const v = current();
     const baseStep = 0.002; // 0.2%
