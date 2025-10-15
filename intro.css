@@ -20,40 +20,43 @@ body {
   align-items: center;
 }
 
+/* Outer container */
 .can-wrapper {
   position: relative;
   width: 180px;
   height: 250px;
 }
 
-/* Jerry can shape */
-.can,
-.can-outline {
+/* Tank shape — Jerry can */
+.tank,
+.tank-outline {
   position: absolute;
   top: 0;
   left: 0;
   width: 180px;
   height: 250px;
   clip-path: polygon(
-    15% 0%, 60% 0%, 65% 5%, 100% 5%, 100% 20%, 85% 20%, 85% 95%, 
-    15% 95%, 15% 20%, 0% 20%, 0% 5%, 40% 5%, 45% 0%
+    15% 0%, 55% 0%, 60% 5%, 90% 5%, 90% 20%, 
+    80% 20%, 80% 95%, 20% 95%, 20% 20%, 
+    10% 20%, 10% 5%, 45% 5%, 50% 0%
   );
 }
 
-.can {
+.tank {
   overflow: hidden;
-  background: black;
+  background: #000;
   z-index: 1;
 }
 
-.can-outline {
+/* Outline stays visible at all times */
+.tank-outline {
   border: 3px solid #F3BA2F;
   box-shadow: 0 0 15px #F3BA2F;
   pointer-events: none;
   z-index: 3;
 }
 
-/* Wave fill */
+/* Wave that fills up */
 .wave {
   background: #F3BA2F;
   position: absolute;
@@ -62,14 +65,22 @@ body {
   width: 200%;
   height: 200%;
   border-radius: 38%;
+  transform: rotate(0deg);
   animation:
-    waveRotate 30s linear infinite,
-    waveFill 4s ease-out forwards;
+    waveRotate 30s linear infinite;
 }
 
+/* wave rotates forever */
 @keyframes waveRotate {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(3600deg); }
+}
+
+/* when filling starts */
+.tank.filling .wave {
+  animation:
+    waveRotate 30s linear infinite,
+    waveFill 4s ease-out forwards;
 }
 
 @keyframes waveFill {
@@ -77,11 +88,12 @@ body {
   100% { top: 0%; }
 }
 
+/* Text label */
 .label {
   margin-top: 20px;
   color: #F3BA2F;
   font-weight: 800;
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
