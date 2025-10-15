@@ -13,6 +13,16 @@ const LINKS = {
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
 /*****************
+ * HERO IMAGES (for hover swaps)
+ *****************/
+const HERO_IMAGES = {
+  default: "station_on.png",
+  tokenomics: "station_hover_tokenomics.png",
+  contract: "station_hover_contract.png",
+  links: "station_hover_links.png",
+};
+
+/*****************
  * ELEMENTS
  *****************/
 const stage = document.getElementById("stage");
@@ -50,7 +60,7 @@ function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-const MOBILE_ZOOM = 1.8; // increase this to zoom more
+const MOBILE_ZOOM = 1.8; // adjust for more/less zoom on mobile
 
 /*****************
  * LAYOUT
@@ -66,7 +76,7 @@ window.layout = function layout() {
 
   if (usingPortraitImage()) {
     const contain = Math.min(vw / iw, vh / ih);
-    const scale = contain * MOBILE_ZOOM; // allow real zoom
+    const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX = Math.floor((vw - dispW) / 2);
@@ -81,24 +91,22 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-// Force full width, center vertically
-const scaleW = vw / iw;           // always match viewport width
-const scale = scaleW * 0.9;       // 0.9 makes it appear "zoomed out" vertically
+    // Desktop: stretch full width, zoom out slightly
+    const scaleW = vw / iw;
+    const scale = scaleW * 0.9;
 
-const dispW = Math.round(iw * scaleW);  // full width
-const dispH = Math.round(ih * scale);   // slightly reduced height
+    const dispW = Math.round(iw * scaleW);
+    const dispH = Math.round(ih * scale);
 
-const offX = 0;                                 // flush to left edge
-const offY = Math.floor((vh - dispH) / 2);      // center vertically
+    const offX = 0;
+    const offY = Math.floor((vh - dispH) / 2);
 
-Object.assign(stage.style, {
-  left: offX + 'px',
-  top: offY + 'px',
-  width: dispW + 'px',
-  height: dispH + 'px'
-});
-
-
+    Object.assign(stage.style, {
+      left: offX + 'px',
+      top: offY + 'px',
+      width: dispW + 'px',
+      height: dispH + 'px'
+    });
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
   }
@@ -120,17 +128,6 @@ function place(spec, dispW, dispH) {
   const y = spec.y * dispH;
   const w = spec.w * dispW;
   const h = spec.h * dispH;
-
-  /*****************
- * HERO IMAGES
- *****************/
-const HERO_IMAGES = {
-  default: "station_on.png",
-  tokenomics: "station_hover_tokenomics.png",
-  contract: "station_hover_contract.png",
-  links: "station_hover_links.png"
-};
-
 
   Object.assign(spec.el.style, {
     position: "absolute",
@@ -195,7 +192,6 @@ document.getElementById("tok-tax").textContent = TOKENOMICS.tax;
 document.getElementById("tok-liq").textContent = TOKENOMICS.liquidity;
 document.getElementById("contract-value").textContent = CONTRACT_ADDRESS;
 
-
 document.getElementById("lnk-buy").href = LINKS.BUY;
 document.getElementById("lnk-chart").href = LINKS.CHART;
 document.getElementById("lnk-dextools").href = LINKS.DEXTOOLS;
@@ -218,7 +214,10 @@ const onOpen = (modal) => (e) => {
     el.addEventListener("click", onOpen(modal));
   }
 });
-// Hover to swap image
+
+/*****************
+ * HOVER IMAGE SWAP
+ *****************/
 const swapHero = (key) => {
   stationImg.src = HERO_IMAGES[key] || HERO_IMAGES.default;
   setBg(stationImg.src);
@@ -231,7 +230,6 @@ const swapHero = (key) => {
     el.addEventListener("mouseleave", () => swapHero("default"));
   }
 });
-
 
 document.querySelectorAll(".modal").forEach((mod) => {
   mod.addEventListener(
