@@ -13,10 +13,11 @@ const LINKS = {
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
 /*****************
- * HERO IMAGES (for hover swaps)
+ * HERO IMAGES
  *****************/
 const HERO_IMAGES = {
   default: "station_on.png",
+  off: "station_off.png",
   tokenomics: "station_hover_tokenomics.png",
   contract: "station_hover_contract.png",
   links: "station_hover_links.png",
@@ -27,7 +28,6 @@ const HERO_IMAGES = {
  *****************/
 const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
-const overlay = document.getElementById("overlay");
 
 function setBg(url) {
   document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
@@ -37,6 +37,17 @@ stationImg.addEventListener("load", () => {
   setBg(stationImg.currentSrc || stationImg.src);
   layout();
 });
+
+/*****************
+ * STATION STATE
+ *****************/
+function setStationState(isOn) {
+  stationImg.src = isOn ? HERO_IMAGES.default : HERO_IMAGES.off;
+  setBg(stationImg.src);
+}
+// Example usage:
+// setStationState(false); // lights off
+// setStationState(true);  // lights on
 
 /*****************
  * HOTSPOTS
@@ -60,7 +71,7 @@ function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-const MOBILE_ZOOM = 1.3; // adjust for more/less zoom on mobile
+const MOBILE_ZOOM = 1.3;
 
 /*****************
  * LAYOUT
@@ -91,7 +102,6 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    // Desktop: stretch full width, zoom out slightly
     const scaleW = vw / iw;
     const scale = scaleW * 0.9;
 
@@ -136,6 +146,7 @@ function place(spec, dispW, dispH) {
     width: w + "px",
     height: h + "px",
     transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`,
+    willChange: "transform, left, top, width, height"
   });
 }
 
@@ -146,39 +157,6 @@ if (window.visualViewport) {
   visualViewport.addEventListener("resize", layout);
   visualViewport.addEventListener("scroll", layout);
 }
-
-/*****************
- * FLICKER
- *****************/
-function setOff(isOff) {
-  stationImg.classList.toggle("off", isOff);
-  overlay.classList.toggle("off", isOff);
-}
-let flickerTimer = null, burstTimer = null;
-function stopFlicker() {
-  clearTimeout(flickerTimer);
-  flickerTimer = null;
-  clearInterval(burstTimer);
-  burstTimer = null;
-}
-function startFlicker() {
-  stopFlicker();
-  const burstCount = Math.floor(Math.random() * 3) + 1;
-  let i = 0;
-  burstTimer = setInterval(() => {
-    setOff(Math.random() > 0.5);
-    if (++i >= burstCount) {
-      clearInterval(burstTimer);
-      burstTimer = null;
-      setOff(Math.random() > 0.85);
-      flickerTimer = setTimeout(startFlicker, 100 + Math.random() * 300);
-    }
-  }, 60);
-}
-startFlicker();
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && !flickerTimer && !burstTimer) startFlicker();
-});
 
 /*****************
  * MODALS + DATA
@@ -212,7 +190,6 @@ const onOpen = (modal) => (e) => {
   if (el) {
     const modal = id === "hs-contract" ? mContract : id === "hs-links" ? mLinks : mTok;
     el.addEventListener("click", onOpen(modal));
-  }
 });
 
 /*****************
@@ -247,6 +224,7 @@ document.addEventListener("keydown", (e) => {
     if (m.getAttribute("aria-hidden") === "false") close(m);
   });
 });
+
 /*****************
  * COPY CONTRACT BUTTON
  *****************/
