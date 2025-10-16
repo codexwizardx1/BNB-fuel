@@ -24,7 +24,7 @@ const HERO_IMAGES = {
 };
 
 /*****************
- * PRELOAD HOVER IMAGES
+ * PRELOAD IMAGES
  *****************/
 Object.values(HERO_IMAGES).forEach((src) => {
   if (src) new Image().src = src;
@@ -47,7 +47,7 @@ stationImg.addEventListener("load", () => {
 });
 
 /*****************
- * HOTSPOTS
+ * HOTSPOTS MAP
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
@@ -152,6 +152,47 @@ if (window.visualViewport) {
   visualViewport.addEventListener("resize", layout);
   visualViewport.addEventListener("scroll", layout);
 }
+
+/*****************
+ * FLICKER LIGHTS
+ *****************/
+let flickerTimer = null;
+let flickerBurst = null;
+
+function setStationState(isOff) {
+  stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
+}
+
+function stopFlicker() {
+  clearTimeout(flickerTimer);
+  clearInterval(flickerBurst);
+  flickerTimer = null;
+  flickerBurst = null;
+  setStationState(false);
+}
+
+function startFlicker() {
+  stopFlicker();
+  const bursts = Math.floor(Math.random() * 3) + 1;
+  let count = 0;
+  flickerBurst = setInterval(() => {
+    setStationState(Math.random() > 0.5);
+    count++;
+    if (count >= bursts) {
+      clearInterval(flickerBurst);
+      flickerBurst = null;
+      setStationState(Math.random() > 0.85);
+      flickerTimer = setTimeout(startFlicker, 200 + Math.random() * 400);
+    }
+  }, 60);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopFlicker();
+  else if (!flickerTimer && !flickerBurst) startFlicker();
+});
+
+startFlicker();
 
 /*****************
  * MODALS + DATA
