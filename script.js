@@ -24,6 +24,16 @@ const HERO_IMAGES = {
 };
 
 /*****************
+ * PRELOAD HOVER IMAGES
+ *****************/
+Object.values(HERO_IMAGES).forEach((src) => {
+  if (src) {
+    const img = new Image();
+    img.src = src;
+  }
+});
+
+/*****************
  * ELEMENTS
  *****************/
 const stage = document.getElementById("stage");
@@ -46,8 +56,6 @@ function setStationState(isOn) {
   stationImg.src = isOn ? HERO_IMAGES.default : HERO_IMAGES.off;
   setBg(stationImg.src);
 }
-// Example (remove or call from elsewhere):
-// setStationState(true);
 
 /*****************
  * HOTSPOTS
@@ -192,7 +200,7 @@ const onOpen = (modal) => (e) => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY
+ * HOVER IMAGE OVERLAY (Blink Fix)
  *****************/
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
@@ -203,8 +211,8 @@ const swapHero = (key) => {
 };
 
 const clearHero = () => {
+  // ⚡ Do not remove src — this avoids the white blink
   stationOverlay.style.opacity = "0";
-  stationOverlay.removeAttribute("src");
 };
 
 ["tokenomics", "contract", "links"].forEach((key) => {
