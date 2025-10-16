@@ -23,30 +23,43 @@ body{
 /* Stage */
 .stage{ position:absolute; z-index:2; }
 
-/* Base station */
+/* Base station & overlay */
 #stationPicture{ position:absolute; inset:0; z-index:0; pointer-events:none; }
-#station{
-  position:absolute; inset:0; width:100%; height:100%; object-fit: fill;
-  pointer-events:none; z-index:0;
+#station,
+#stationOverlay {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit: contain;                /* 👈 sharper than fill */
+  pointer-events:none;
+  z-index:0;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  transform: translateZ(0);
+  will-change: opacity;
 }
 
-/* Overlay image */
+/* Overlay image only */
 #stationOverlay{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  object-fit: fill;
-  pointer-events:none;
   z-index:1;
   opacity:0;
   transition: opacity 0.25s ease-in-out;
   background: transparent;
-  mix-blend-mode: normal; /* 👈 solid overlay */
+  mix-blend-mode: normal; /* 👈 shows overlay solidly */
 }
 
 /* Hotspots */
 .hotspot{
-  position:absolute; z-index:9999; pointer-events:auto;
-  background:transparent; border:0; padding:0; margin:0; cursor:pointer;
+  position:absolute;
+  z-index:9999;
+  pointer-events:auto;
+  background:transparent;
+  border:0;
+  padding:0;
+  margin:0;
+  cursor:pointer;
   will-change: transform, left, top, width, height;
 }
 
@@ -61,23 +74,55 @@ body{
 }
 .modal-card h2{ margin:0 0 10px; font-size:18px; color:var(--bnb-yellow); }
 .modal-card code{
-  display:block; background:#111; border:1px solid #1f1f1f; padding:10px; border-radius:8px; font-size:14px; word-break:break-all;
+  display:block; background:#111; border:1px solid #1f1f1f;
+  padding:10px; border-radius:8px; font-size:14px; word-break:break-all;
 }
 .modal-actions{ display:flex; gap:10px; margin-top:14px; }
 .modal-actions button{
   background:var(--bnb-yellow); color:#000; border:0; border-radius:10px;
   padding:10px 14px; font-weight:800; letter-spacing:.04em; cursor:pointer;
 }
-.modal-actions button[data-close]{ background:#1c1c1c; color:#eee; border:1px solid #2a2a2a; }
+.modal-actions button[data-close]{
+  background:#1c1c1c; color:#eee; border:1px solid #2a2a2a;
+}
 
 /* Links grid */
-.links-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:6px; }
-.link-btn{ display:block; text-align:center; text-decoration:none; border-radius:10px; padding:12px 10px; background:var(--bnb-yellow); color:#000; font-weight:800; letter-spacing:.04em; }
+.links-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:6px;
+}
+.link-btn{
+  display:block;
+  text-align:center;
+  text-decoration:none;
+  border-radius:10px;
+  padding:12px 10px;
+  background:var(--bnb-yellow);
+  color:#000;
+  font-weight:800;
+  letter-spacing:.04em;
+}
 
 /* Tokenomics table */
-.tok-table{ width:100%; border-collapse:separate; border-spacing:0 8px; margin-top:6px; }
-.tok-table th,.tok-table td{ padding:10px; border:1px solid #1f1f1f; background:#111; }
-.tok-table th{ color:#ddd; text-align:left; width:38%; }
+.tok-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0 8px;
+  margin-top:6px;
+}
+.tok-table th,
+.tok-table td{
+  padding:10px;
+  border:1px solid #1f1f1f;
+  background:#111;
+}
+.tok-table th{
+  color:#ddd;
+  text-align:left;
+  width:38%;
+}
 .tok-table td{ color:#fff; }
 
 /* Mobile viewport handling */
@@ -85,10 +130,18 @@ body{
 #root { height: 100vh; }
 
 @media (max-width: 640px){
-  .modal-card{ max-height: 90dvh; overflow:auto; padding-bottom: calc(22px + env(safe-area-inset-bottom, 0)); }
+  .modal-card{
+    max-height: 90dvh;
+    overflow:auto;
+    padding-bottom: calc(22px + env(safe-area-inset-bottom, 0));
+  }
 }
 
 /* Focus rings */
-.hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
-  outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
+.hotspot:focus-visible,
+.modal-actions button:focus-visible,
+.link-btn:focus-visible{
+  outline:2px solid var(--bnb-yellow);
+  outline-offset:2px;
+  border-radius:8px;
 }
