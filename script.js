@@ -47,14 +47,6 @@ stationImg.addEventListener("load", () => {
 });
 
 /*****************
- * LIGHTS ON / OFF
- *****************/
-function setStationState(isOn) {
-  stationImg.src = isOn ? HERO_IMAGES.default : HERO_IMAGES.off;
-  setBg(stationImg.src);
-}
-
-/*****************
  * HOTSPOTS
  *****************/
 const HS_LANDSCAPE = {
@@ -197,7 +189,7 @@ const onOpen = (modal) => (e) => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY — FIXED
+ * HOVER IMAGE OVERLAY
  *****************/
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
