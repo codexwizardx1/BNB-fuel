@@ -1,8 +1,5 @@
 :root{
   --bnb-yellow:#F3BA2F;
-  --off-brightness:0.18;
-  --off-saturation:0.35;
-  --off-contrast:0.95;
   --bg-url: url("station_on.png");
 }
 
@@ -30,23 +27,15 @@ body{
 #stationPicture{ position:absolute; inset:0; z-index:0; pointer-events:none; }
 #station{
   position:absolute; inset:0; width:100%; height:100%; object-fit: fill;
-  transition: filter 80ms linear; pointer-events:none; z-index:0;
+  pointer-events:none; z-index:0;
+  transition: opacity 0.2s ease-in-out;
 }
-
-/* Flicker overlay (under hotspots) */
-.dark-overlay{
-  position:absolute; inset:0; background:#000; mix-blend-mode:multiply;
-  opacity:0; transition:opacity 80ms linear; pointer-events:none; z-index:1;
-}
-#station.off{
-  filter:brightness(var(--off-brightness)) saturate(var(--off-saturation)) contrast(var(--off-contrast));
-}
-.dark-overlay.off{ opacity:0.35; }
 
 /* Hotspots always on top */
 .hotspot{
   position:absolute; z-index:9999; pointer-events:auto;
   background:transparent; border:0; padding:0; margin:0; cursor:pointer;
+  will-change: transform, left, top, width, height;
 }
 
 /* Modals */
