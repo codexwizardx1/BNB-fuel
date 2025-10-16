@@ -85,3 +85,6 @@ body{
 .hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
+#stationOverlay {
+  background: #000; /* prevents edge flicker on transparent areas */
+}
