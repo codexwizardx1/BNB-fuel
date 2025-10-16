@@ -40,7 +40,7 @@ body{
   opacity:0;
   transition: opacity 0.25s ease-in-out;
   background: transparent;
-  mix-blend-mode: lighten; /* optional if glow effect */
+  mix-blend-mode: normal; /* 👈 solid overlay */
 }
 
 /* Hotspots */
