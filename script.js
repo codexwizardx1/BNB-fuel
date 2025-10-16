@@ -27,10 +27,7 @@ const HERO_IMAGES = {
  * PRELOAD HOVER IMAGES
  *****************/
 Object.values(HERO_IMAGES).forEach((src) => {
-  if (src) {
-    const img = new Image();
-    img.src = src;
-  }
+  if (src) new Image().src = src;
 });
 
 /*****************
@@ -200,7 +197,7 @@ const onOpen = (modal) => (e) => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY (Blink Fix)
+ * HOVER IMAGE OVERLAY — FIXED
  *****************/
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
@@ -211,7 +208,6 @@ const swapHero = (key) => {
 };
 
 const clearHero = () => {
-  // ⚡ Do not remove src — this avoids the white blink
   stationOverlay.style.opacity = "0";
 };
 
