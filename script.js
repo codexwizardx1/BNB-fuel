@@ -28,6 +28,7 @@ const HERO_IMAGES = {
  *****************/
 const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
+const stationOverlay = document.getElementById("stationOverlay");
 
 function setBg(url) {
   document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
@@ -45,9 +46,8 @@ function setStationState(isOn) {
   stationImg.src = isOn ? HERO_IMAGES.default : HERO_IMAGES.off;
   setBg(stationImg.src);
 }
-// Example usage:
-// setStationState(false); // lights off
-// setStationState(true);  // lights on
+// Example (remove or call from elsewhere):
+// setStationState(true);
 
 /*****************
  * HOTSPOTS
@@ -192,21 +192,32 @@ const onOpen = (modal) => (e) => {
 });
 
 /*****************
- * HOVER IMAGE SWAP
+ * HOVER IMAGE OVERLAY
  *****************/
 const swapHero = (key) => {
-  stationImg.src = HERO_IMAGES[key] || HERO_IMAGES.default;
-  setBg(stationImg.src);
+  const img = HERO_IMAGES[key];
+  if (img) {
+    stationOverlay.src = img;
+    stationOverlay.style.opacity = "1";
+  }
+};
+
+const clearHero = () => {
+  stationOverlay.style.opacity = "0";
+  stationOverlay.removeAttribute("src");
 };
 
 ["tokenomics", "contract", "links"].forEach((key) => {
   const el = document.getElementById(`hs-${key}`);
   if (el && HERO_IMAGES[key]) {
     el.addEventListener("mouseenter", () => swapHero(key));
-    el.addEventListener("mouseleave", () => swapHero("default"));
+    el.addEventListener("mouseleave", clearHero);
   }
 });
 
+/*****************
+ * MODAL CLOSE
+ *****************/
 document.querySelectorAll(".modal").forEach((mod) => {
   mod.addEventListener(
     "click",
