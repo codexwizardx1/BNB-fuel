@@ -80,3 +80,14 @@ body{
 .hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
+#stationOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 1; /* above station */
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
