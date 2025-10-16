@@ -12,13 +12,7 @@ body{
 
 /* Full viewport + blurred bg */
 #root{ position:fixed; inset:0; overflow:hidden; }
-#root::before{
-  content:""; position:fixed; inset:0; z-index:0;
-  background: var(--bg-url) center / cover no-repeat;
-  filter: blur(24px) brightness(0.55) saturate(1.08);
-  transform: scale(1.12);
-  pointer-events:none;
-}
+
 
 /* Stage where the image renders */
 .stage{ position:absolute; z-index:2; }
