@@ -39,7 +39,7 @@ stationImg.addEventListener("load", () => {
 });
 
 /*****************
- * STATION STATE
+ * LIGHTS ON / OFF
  *****************/
 function setStationState(isOn) {
   stationImg.src = isOn ? HERO_IMAGES.default : HERO_IMAGES.off;
@@ -65,7 +65,7 @@ function hydrate(map) {
 }
 
 /*****************
- * DETECT PORTRAIT (mobile)
+ * DETECT PORTRAIT
  *****************/
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
@@ -104,10 +104,8 @@ window.layout = function layout() {
   } else {
     const scaleW = vw / iw;
     const scale = scaleW * 0.9;
-
     const dispW = Math.round(iw * scaleW);
     const dispH = Math.round(ih * scale);
-
     const offX = 0;
     const offY = Math.floor((vh - dispH) / 2);
 
@@ -190,6 +188,7 @@ const onOpen = (modal) => (e) => {
   if (el) {
     const modal = id === "hs-contract" ? mContract : id === "hs-links" ? mLinks : mTok;
     el.addEventListener("click", onOpen(modal));
+  }
 });
 
 /*****************
