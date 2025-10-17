@@ -18,9 +18,8 @@
 </head>
 
 <body>
-  <!-- ✅ Fixed overlays -->
+  <!-- ✅ Fixed logo only -->
   <img src="bifuel-logo.png" alt="BNB Fuel Logo" id="logo">
-  <img src="rewards.png" alt="Rewards Overlay" id="rewardsOverlay">
 
   <div id="root">
     <div class="stage" id="stage">
@@ -29,6 +28,8 @@
                 media="(max-width: 768px) and (orientation: portrait)" />
         <img id="station" src="station_on.png" alt="BNB Fuel Station" />
         <img id="stationOverlay" alt="" />
+        <!-- ✅ Rewards image is now inside the stage -->
+        <img src="rewards.png" alt="Rewards" id="rewardsOverlay">
       </picture>
 
       <!-- Hotspots -->
@@ -38,7 +39,7 @@
     </div>
   </div>
 
-  <!-- CONTRACT MODAL -->
+  <!-- Modals (unchanged) -->
   <div class="modal" id="modal-contract" aria-hidden="true">
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contract-title">
@@ -51,7 +52,6 @@
     </div>
   </div>
 
-  <!-- LINKS MODAL -->
   <div class="modal" id="modal-links" aria-hidden="true">
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="links-title">
@@ -70,7 +70,6 @@
     </div>
   </div>
 
-  <!-- TOKENOMICS MODAL -->
   <div class="modal" id="modal-tokenomics" aria-hidden="true">
     <div class="modal-backdrop" data-close></div>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="toks-title">
