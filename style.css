@@ -24,13 +24,14 @@ body{
 /* ✅ Rewards overlay in bottom-right */
 #rewardsOverlay {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  height: 180px; /* adjust size as needed */
-  width: auto;
+  top: 0;
+  left: 0;
   z-index: 10001;
-  pointer-events: none; /* not clickable */
+  pointer-events: none;
+  width: auto;
+  height: auto;
 }
+
 
 /* Full viewport + blurred bg */
 #root{ position:fixed; inset:0; overflow:hidden; }
