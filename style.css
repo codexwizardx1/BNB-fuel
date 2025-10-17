@@ -15,12 +15,22 @@ body{
   position: fixed;
   top: 20px;
   left: 20px;
-  height: 160px;   /* ⬅️ increased from 60px */
+  height: 160px; /* bigger size */
   width: auto;
   z-index: 10001;
-  pointer-events: none;
+  pointer-events: none; /* not clickable */
 }
 
+/* ✅ Rewards overlay in bottom-right */
+#rewardsOverlay {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: 180px; /* adjust size as needed */
+  width: auto;
+  z-index: 10001;
+  pointer-events: none; /* not clickable */
+}
 
 /* Full viewport + blurred bg */
 #root{ position:fixed; inset:0; overflow:hidden; }
