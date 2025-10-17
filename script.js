@@ -12,9 +12,6 @@ const LINKS = {
 };
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
-/*****************
- * HERO IMAGES
- *****************/
 const HERO_IMAGES = {
   default: "station_on.png",
   off: "station_off.png",
@@ -23,9 +20,6 @@ const HERO_IMAGES = {
   links: "station_hover_links.png",
 };
 
-/*****************
- * PRELOAD
- *****************/
 Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
@@ -45,7 +39,7 @@ stationImg.addEventListener("load", () => {
 });
 
 /*****************
- * HOTSPOTS MAP (same positions you had)
+ * HOTSPOTS MAP
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
@@ -55,24 +49,17 @@ const HS_LANDSCAPE = {
 
 function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
 
-/*****************
- * DETECT PORTRAIT (mobile)
- *****************/
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-const MOBILE_ZOOM = 1.3; // keep your original mobile look
+const MOBILE_ZOOM = 1.3;
 
-/*****************
- * LAYOUT — back to your original behavior so hotspots align
- *****************/
 let HS = null;
 
 window.layout = function layout() {
   const vw = window.innerWidth;
   const vh = window.visualViewport?.height ? Math.floor(window.visualViewport.height) : window.innerHeight;
-
   const iw = stationImg.naturalWidth || 1152;
   const ih = stationImg.naturalHeight || 768;
 
@@ -93,21 +80,14 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // DESKTOP: same math you had before (fills width, slight vertical zoom)
     const scaleW = vw / iw;
-    const scale  = scaleW * 0.9; // your previous slight zoom
-    const dispW  = Math.round(iw * scaleW);
-    const dispH  = Math.round(ih * scale);
-    const offX   = 0;
-    const offY   = Math.floor((vh - dispH) / 2);
+    const scale = scaleW * 0.9;
+    const dispW = Math.round(iw * scaleW);
+    const dispH = Math.round(ih * scale);
+    const offX = 0;
+    const offY = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, {
-      left: offX + 'px',
-      top:  offY + 'px',
-      width:  dispW + 'px',
-      height: dispH + 'px'
-    });
-
+    Object.assign(stage.style, { left: offX + 'px', top: offY + 'px', width: dispW + 'px', height: dispH + 'px' });
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
   }
 
@@ -145,6 +125,43 @@ if (window.visualViewport) {
 }
 
 /*****************
+ * FLICKER EFFECT (station_off)
+ *****************/
+function setOff(isOff) {
+  stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
+}
+let flickerTimer = null;
+let burstTimer = null;
+
+function stopFlicker() {
+  clearTimeout(flickerTimer);
+  flickerTimer = null;
+  clearInterval(burstTimer);
+  burstTimer = null;
+}
+
+function startFlicker() {
+  stopFlicker();
+  const burstCount = Math.floor(Math.random() * 3) + 1;
+  let i = 0;
+  burstTimer = setInterval(() => {
+    setOff(Math.random() > 0.5);
+    if (++i >= burstCount) {
+      clearInterval(burstTimer);
+      burstTimer = null;
+      setOff(Math.random() > 0.85);
+      flickerTimer = setTimeout(startFlicker, 100 + Math.random() * 300);
+    }
+  }, 60);
+}
+
+startFlicker();
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && !flickerTimer && !burstTimer) startFlicker();
+});
+
+/*****************
  * MODALS + DATA
  *****************/
 const mContract = document.getElementById("modal-contract");
@@ -175,8 +192,15 @@ const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open
   }
 });
 
+document.querySelectorAll("[data-close]").forEach(el => {
+  el.addEventListener("click", () => {
+    const modal = el.closest(".modal");
+    if (modal) close(modal);
+  });
+});
+
 /*****************
- * HOVER IMAGE OVERLAY (no base swap)
+ * HOVER IMAGE OVERLAY
  *****************/
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
@@ -193,7 +217,7 @@ const clearHero = () => { stationOverlay.style.opacity = "0"; };
 });
 
 /*****************
- * COPY CONTRACT BUTTON
+ * COPY CONTRACT
  *****************/
 const copyBtn = document.getElementById("copyContract");
 if (copyBtn) {
