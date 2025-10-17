@@ -24,7 +24,7 @@ const HERO_IMAGES = {
 };
 
 /*****************
- * PRELOAD IMAGES
+ * PRELOAD
  *****************/
 Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
 
@@ -45,27 +45,27 @@ stationImg.addEventListener("load", () => {
 });
 
 /*****************
- * HOTSPOTS MAP
+ * HOTSPOTS MAP (same positions you had)
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
-  contract: { id: "hs-contract", x: 0.4810, y: 0.6450, w: 0.1020, h: 0.0340, skew: -4, rot: 5.2 },
-  links: { id: "hs-links", x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
+  contract:  { id: "hs-contract",  x: 0.4810, y: 0.6450, w: 0.1020, h: 0.0340, skew: -4, rot: 5.2 },
+  links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
 };
 
 function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
 
 /*****************
- * DETECT PORTRAIT
+ * DETECT PORTRAIT (mobile)
  *****************/
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-const MOBILE_ZOOM = 1.0; // keep overlays aligned; raise only if you want intentional crop
+const MOBILE_ZOOM = 1.3; // keep your original mobile look
 
 /*****************
- * LAYOUT  (FIXED: preserve aspect ratio; no distortion)
+ * LAYOUT — back to your original behavior so hotspots align
  *****************/
 let HS = null;
 
@@ -77,7 +77,8 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    const scale = Math.min(vw / iw, vh / ih) * MOBILE_ZOOM;
+    const contain = Math.min(vw / iw, vh / ih);
+    const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX = Math.floor((vw - dispW) / 2);
@@ -88,21 +89,22 @@ window.layout = function layout() {
     const remap = (v) => v ? ({ ...v, y: 0.3125 + 0.375 * v.y, h: 0.375 * v.h }) : null;
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
-      contract: remap(HS_LANDSCAPE.contract),
-      links: remap(HS_LANDSCAPE.links),
+      contract:  remap(HS_LANDSCAPE.contract),
+      links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ DESKTOP: scale BOTH axes with the SAME factor (no distortion)
-    const scale = Math.min(vw / iw, vh / ih);
-    const dispW = Math.round(iw * scale);
-    const dispH = Math.round(ih * scale);
-    const offX = Math.floor((vw - dispW) / 2);
-    const offY = Math.floor((vh - dispH) / 2);
+    // DESKTOP: same math you had before (fills width, slight vertical zoom)
+    const scaleW = vw / iw;
+    const scale  = scaleW * 0.9; // your previous slight zoom
+    const dispW  = Math.round(iw * scaleW);
+    const dispH  = Math.round(ih * scale);
+    const offX   = 0;
+    const offY   = Math.floor((vh - dispH) / 2);
 
     Object.assign(stage.style, {
       left: offX + 'px',
-      top: offY + 'px',
-      width: dispW + 'px',
+      top:  offY + 'px',
+      width:  dispW + 'px',
       height: dispH + 'px'
     });
 
@@ -114,7 +116,7 @@ window.layout = function layout() {
   const dispW = rect.width;
   const dispH = rect.height;
 
-  Object.values(HS).filter((spec) => spec && spec.el).forEach((spec) => place(spec, dispW, dispH));
+  Object.values(HS).filter((s)=>s && s.el).forEach((spec) => place(spec, dispW, dispH));
 };
 
 function place(spec, dispW, dispH) {
@@ -126,8 +128,8 @@ function place(spec, dispW, dispH) {
   Object.assign(spec.el.style, {
     position: "absolute",
     left: x - w / 2 + "px",
-    top: y - h / 2 + "px",
-    width: w + "px",
+    top:  y - h / 2 + "px",
+    width:  w + "px",
     height: h + "px",
     transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`,
     willChange: "transform, left, top, width, height"
@@ -143,52 +145,23 @@ if (window.visualViewport) {
 }
 
 /*****************
- * FLICKER LIGHTS (on/off image swap)
- *****************/
-let flickerTimer = null;
-let flickerBurst = null;
-function setStationState(isOff) { stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default; }
-function stopFlicker() {
-  clearTimeout(flickerTimer);
-  clearInterval(flickerBurst);
-  flickerTimer = null; flickerBurst = null;
-  setStationState(false);
-}
-function startFlicker() {
-  stopFlicker();
-  const bursts = Math.floor(Math.random() * 3) + 1;
-  let count = 0;
-  flickerBurst = setInterval(() => {
-    setStationState(Math.random() > 0.5);
-    count++;
-    if (count >= bursts) {
-      clearInterval(flickerBurst); flickerBurst = null;
-      setStationState(Math.random() > 0.85);
-      flickerTimer = setTimeout(startFlicker, 200 + Math.random() * 400);
-    }
-  }, 60);
-}
-document.addEventListener("visibilitychange", () => { if (document.hidden) stopFlicker(); else if (!flickerTimer && !flickerBurst) startFlicker(); });
-startFlicker();
-
-/*****************
  * MODALS + DATA
  *****************/
 const mContract = document.getElementById("modal-contract");
-const mLinks = document.getElementById("modal-links");
-const mTok = document.getElementById("modal-tokenomics");
+const mLinks    = document.getElementById("modal-links");
+const mTok      = document.getElementById("modal-tokenomics");
 
 document.getElementById("tok-supply").textContent = TOKENOMICS.supply;
-document.getElementById("tok-tax").textContent = TOKENOMICS.tax;
-document.getElementById("tok-liq").textContent = TOKENOMICS.liquidity;
+document.getElementById("tok-tax").textContent    = TOKENOMICS.tax;
+document.getElementById("tok-liq").textContent    = TOKENOMICS.liquidity;
 document.getElementById("contract-value").textContent = CONTRACT_ADDRESS;
 
-document.getElementById("lnk-buy").href = LINKS.BUY;
-document.getElementById("lnk-chart").href = LINKS.CHART;
-document.getElementById("lnk-dextools").href = LINKS.DEXTOOLS;
-document.getElementById("lnk-telegram").href = LINKS.TELEGRAM;
-document.getElementById("lnk-twitter").href = LINKS.TWITTER;
-document.getElementById("lnk-whitepaper").href = LINKS.WHITEPAPER;
+document.getElementById("lnk-buy").href       = LINKS.BUY;
+document.getElementById("lnk-chart").href     = LINKS.CHART;
+document.getElementById("lnk-dextools").href  = LINKS.DEXTOOLS;
+document.getElementById("lnk-telegram").href  = LINKS.TELEGRAM;
+document.getElementById("lnk-twitter").href   = LINKS.TWITTER;
+document.getElementById("lnk-whitepaper").href= LINKS.WHITEPAPER;
 
 const open = (m) => m.setAttribute("aria-hidden", "false");
 const close = (m) => m.setAttribute("aria-hidden", "true");
@@ -203,7 +176,7 @@ const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open
 });
 
 /*****************
- * HOVER IMAGE OVERLAY (tokenomics/contract/links)
+ * HOVER IMAGE OVERLAY (no base swap)
  *****************/
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
@@ -217,21 +190,6 @@ const clearHero = () => { stationOverlay.style.opacity = "0"; };
     el.addEventListener("mouseenter", () => swapHero(key));
     el.addEventListener("mouseleave", clearHero);
   }
-});
-
-/*****************
- * MODAL CLOSE
- *****************/
-document.querySelectorAll(".modal").forEach((mod) => {
-  mod.addEventListener("click", (e) => {
-    if (e.target.matches("[data-close]") || e.target.classList.contains("modal-backdrop")) close(mod);
-  }, { capture: true });
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") [mContract, mLinks, mTok].forEach((m) => {
-    if (m.getAttribute("aria-hidden") === "false") close(m);
-  });
 });
 
 /*****************
