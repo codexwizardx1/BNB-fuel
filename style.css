@@ -39,7 +39,7 @@ body{
 
 /* ✅ Stage fills the entire screen */
 .stage {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
@@ -49,22 +49,23 @@ body{
 
 /* ✅ Image stack inside stage */
 #stationPicture{
-  position:absolute;
+  position:fixed;
   inset:0;
   z-index:0;
   pointer-events:none;
 }
 
-/* ✅ Stretch all images to fill stage */
+/* ✅ ALL IMAGES fill full viewport */
 #station,
 #stationOverlay,
 #rewardsOverlay {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit: fill;   /* 🔥 stretches to fill full screen */
-  pointer-events:none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;   /* 👈 fills full screen like original */
+  pointer-events: none;
 }
 
 /* ✅ Layer order */
@@ -78,10 +79,9 @@ body{
   mix-blend-mode: normal;
 }
 
-/* 🟡 Rewards overlay always on top */
 #rewardsOverlay {
-  z-index: 9999;
-  pointer-events: none; /* allows clicks to pass through */
+  z-index: 9999; /* always above everything */
+  pointer-events: none;
 }
 
 /* ✅ Hotspots */
