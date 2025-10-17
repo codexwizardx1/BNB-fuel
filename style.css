@@ -10,6 +10,17 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
+/* ✅ Logo in top-left */
+#logo {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  height: 60px;
+  width: auto;
+  z-index: 10001;
+  pointer-events: none; /* allows clicks through */
+}
+
 /* Full viewport + blurred bg */
 #root{ position:fixed; inset:0; overflow:hidden; }
 #root::before{
@@ -40,7 +51,7 @@ body{
   opacity:0;
   transition: opacity 0.25s ease-in-out;
   background: transparent;
-  mix-blend-mode: normal; /* 👈 solid overlay */
+  mix-blend-mode: normal;
 }
 
 /* Hotspots */
