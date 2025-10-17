@@ -26,9 +26,7 @@ const HERO_IMAGES = {
 /*****************
  * PRELOAD IMAGES
  *****************/
-Object.values(HERO_IMAGES).forEach((src) => {
-  if (src) new Image().src = src;
-});
+Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
  * ELEMENTS
@@ -55,11 +53,7 @@ const HS_LANDSCAPE = {
   links: { id: "hs-links", x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
 };
 
-function hydrate(map) {
-  Object.values(map).forEach((s) => {
-    s.el = document.getElementById(s.id) || null;
-  });
-}
+function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
 
 /*****************
  * DETECT PORTRAIT
@@ -68,10 +62,10 @@ function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-const MOBILE_ZOOM = 1.3;
+const MOBILE_ZOOM = 1.0; // keep overlays aligned; raise only if you want intentional crop
 
 /*****************
- * LAYOUT
+ * LAYOUT  (FIXED: preserve aspect ratio; no distortion)
  *****************/
 let HS = null;
 
@@ -83,8 +77,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    const contain = Math.min(vw / iw, vh / ih);
-    const scale = contain * MOBILE_ZOOM;
+    const scale = Math.min(vw / iw, vh / ih) * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX = Math.floor((vw - dispW) / 2);
@@ -99,11 +92,11 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    const scaleW = vw / iw;
-    const scale = scaleW * 0.9;
-    const dispW = Math.round(iw * scaleW);
+    // ✅ DESKTOP: scale BOTH axes with the SAME factor (no distortion)
+    const scale = Math.min(vw / iw, vh / ih);
+    const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
-    const offX = 0;
+    const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
     Object.assign(stage.style, {
@@ -121,14 +114,10 @@ window.layout = function layout() {
   const dispW = rect.width;
   const dispH = rect.height;
 
-  Object.values(HS)
-    .filter((spec) => spec && spec.el)
-    .forEach((spec) => place(spec, dispW, dispH));
+  Object.values(HS).filter((spec) => spec && spec.el).forEach((spec) => place(spec, dispW, dispH));
 };
 
 function place(spec, dispW, dispH) {
-  if (!spec || !spec.el) return;
-
   const x = spec.x * dispW;
   const y = spec.y * dispH;
   const w = spec.w * dispW;
@@ -154,23 +143,17 @@ if (window.visualViewport) {
 }
 
 /*****************
- * FLICKER LIGHTS
+ * FLICKER LIGHTS (on/off image swap)
  *****************/
 let flickerTimer = null;
 let flickerBurst = null;
-
-function setStationState(isOff) {
-  stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
-}
-
+function setStationState(isOff) { stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default; }
 function stopFlicker() {
   clearTimeout(flickerTimer);
   clearInterval(flickerBurst);
-  flickerTimer = null;
-  flickerBurst = null;
+  flickerTimer = null; flickerBurst = null;
   setStationState(false);
 }
-
 function startFlicker() {
   stopFlicker();
   const bursts = Math.floor(Math.random() * 3) + 1;
@@ -179,19 +162,13 @@ function startFlicker() {
     setStationState(Math.random() > 0.5);
     count++;
     if (count >= bursts) {
-      clearInterval(flickerBurst);
-      flickerBurst = null;
+      clearInterval(flickerBurst); flickerBurst = null;
       setStationState(Math.random() > 0.85);
       flickerTimer = setTimeout(startFlicker, 200 + Math.random() * 400);
     }
   }, 60);
 }
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) stopFlicker();
-  else if (!flickerTimer && !flickerBurst) startFlicker();
-});
-
+document.addEventListener("visibilitychange", () => { if (document.hidden) stopFlicker(); else if (!flickerTimer && !flickerBurst) startFlicker(); });
 startFlicker();
 
 /*****************
@@ -215,11 +192,7 @@ document.getElementById("lnk-whitepaper").href = LINKS.WHITEPAPER;
 
 const open = (m) => m.setAttribute("aria-hidden", "false");
 const close = (m) => m.setAttribute("aria-hidden", "true");
-const onOpen = (modal) => (e) => {
-  e.stopPropagation();
-  e.preventDefault();
-  open(modal);
-};
+const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
 
 ["hs-contract", "hs-links", "hs-tokenomics"].forEach((id) => {
   const el = document.getElementById(id);
@@ -230,19 +203,13 @@ const onOpen = (modal) => (e) => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY
+ * HOVER IMAGE OVERLAY (tokenomics/contract/links)
  *****************/
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
-  if (img) {
-    stationOverlay.src = img;
-    stationOverlay.style.opacity = "1";
-  }
+  if (img) { stationOverlay.src = img; stationOverlay.style.opacity = "1"; }
 };
-
-const clearHero = () => {
-  stationOverlay.style.opacity = "0";
-};
+const clearHero = () => { stationOverlay.style.opacity = "0"; };
 
 ["tokenomics", "contract", "links"].forEach((key) => {
   const el = document.getElementById(`hs-${key}`);
@@ -256,14 +223,9 @@ const clearHero = () => {
  * MODAL CLOSE
  *****************/
 document.querySelectorAll(".modal").forEach((mod) => {
-  mod.addEventListener(
-    "click",
-    (e) => {
-      if (e.target.matches("[data-close]") || e.target.classList.contains("modal-backdrop"))
-        close(mod);
-    },
-    { capture: true }
-  );
+  mod.addEventListener("click", (e) => {
+    if (e.target.matches("[data-close]") || e.target.classList.contains("modal-backdrop")) close(mod);
+  }, { capture: true });
 });
 
 document.addEventListener("keydown", (e) => {
@@ -278,16 +240,8 @@ document.addEventListener("keydown", (e) => {
 const copyBtn = document.getElementById("copyContract");
 if (copyBtn) {
   copyBtn.addEventListener("click", () => {
-    const textToCopy = CONTRACT_ADDRESS;
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        copyBtn.textContent = "Copied!";
-        setTimeout(() => {
-          copyBtn.textContent = "Copy";
-        }, 2000);
-      })
-      .catch(() => {
-        alert("Failed to copy address. Please copy manually.");
-      });
+    navigator.clipboard.writeText(CONTRACT_ADDRESS)
+      .then(() => { copyBtn.textContent = "Copied!"; setTimeout(() => { copyBtn.textContent = "Copy"; }, 2000); })
+      .catch(() => { alert("Failed to copy address. Please copy manually."); });
   });
 }
