@@ -15,11 +15,12 @@ body{
   position: fixed;
   top: 20px;
   left: 20px;
-  height: 60px;
+  height: 160px;   /* ⬅️ increased from 60px */
   width: auto;
   z-index: 10001;
-  pointer-events: none; /* allows clicks through */
+  pointer-events: none;
 }
+
 
 /* Full viewport + blurred bg */
 #root{ position:fixed; inset:0; overflow:hidden; }
