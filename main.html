@@ -18,7 +18,7 @@
 </head>
 
 <body>
-  <!-- Fixed logo (independent of stage) -->
+  <!-- Fixed logo -->
   <img src="bifuel-logo.png" alt="BNB Fuel Logo" id="logo">
 
   <div id="root">
@@ -26,12 +26,12 @@
       <picture id="stationPicture">
         <source srcset="station_mobile_1080x19202.png"
                 media="(max-width: 768px) and (orientation: portrait)" />
-        <!-- Base image (on/off flickers between on/off src in JS) -->
+        <!-- Base station image -->
         <img id="station" src="station_on.png" alt="BNB Fuel Station" />
-        <!-- Hover overlay for tokenomics/contract/links -->
+        <!-- Hover overlay (tokenomics/contract/links) -->
         <img id="stationOverlay" alt="" />
-        <!-- Always-on overlay you exported from PSD -->
-        <img id="rewardsOverlay" src="rewards.png" alt="Rewards overlay" />
+        <!-- Permanent rewards overlay (always on, above everything, clicks pass through) -->
+        <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
       </picture>
 
       <!-- Hotspots -->
