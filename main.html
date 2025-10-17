@@ -1,108 +1,96 @@
-:root{
-  --bnb-yellow:#F3BA2F;
-  --bg-url: url("station_on.png");
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BNB Fuel</title>
+  <link rel="stylesheet" href="style.css" />
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; background:#000; overflow:hidden; color:#fff;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-}
+  <!-- Preload images -->
+  <link rel="preload" as="image" href="station_hover_tokenomics.png">
+  <link rel="preload" as="image" href="station_hover_contract.png">
+  <link rel="preload" as="image" href="station_hover_links.png">
+  <link rel="preload" as="image" href="station_on.png" />
+  <link rel="preload" as="image" href="station_off.png" />
+  <link rel="preload" as="image" href="station_mobile_1080x19202.png" />
+  <link rel="preload" as="image" href="bifuel-logo.png" />
+  <link rel="preload" as="image" href="rewards.png" />
+</head>
 
-/* Fixed logo (top-left) */
-#logo {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  height: 160px; /* adjust to your liking */
-  width: auto;
-  z-index: 10001;
-  pointer-events: none;
-}
+<body>
+  <!-- Fixed logo (independent of stage) -->
+  <img src="bifuel-logo.png" alt="BNB Fuel Logo" id="logo">
 
-/* Full viewport + blurred bg */
-#root{ position:fixed; inset:0; overflow:hidden; }
-#root::before{
-  content:""; position:fixed; inset:0; z-index:0;
-  background: var(--bg-url) center / cover no-repeat;
-  filter: blur(24px) brightness(0.55) saturate(1.08);
-  transform: scale(1.12);
-  pointer-events:none;
-}
+  <div id="root">
+    <div class="stage" id="stage">
+      <picture id="stationPicture">
+        <source srcset="station_mobile_1080x19202.png"
+                media="(max-width: 768px) and (orientation: portrait)" />
+        <!-- Base image (on/off flickers between on/off src in JS) -->
+        <img id="station" src="station_on.png" alt="BNB Fuel Station" />
+        <!-- Hover overlay for tokenomics/contract/links -->
+        <img id="stationOverlay" alt="" />
+        <!-- Always-on overlay you exported from PSD -->
+        <img id="rewardsOverlay" src="rewards.png" alt="Rewards overlay" />
+      </picture>
 
-/* Stage */
-.stage{ position:absolute; z-index:2; }
+      <!-- Hotspots -->
+      <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
+      <button class="hotspot" id="hs-contract" aria-label="Show contract address"></button>
+      <button class="hotspot" id="hs-links" aria-label="Show links"></button>
+    </div>
+  </div>
 
-/* Image stack inside stage */
-#stationPicture{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  <!-- CONTRACT MODAL -->
+  <div class="modal" id="modal-contract" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contract-title">
+      <h2 id="contract-title">Contract Address</h2>
+      <code id="contract-value">0x...</code>
+      <div class="modal-actions">
+        <button id="copyContract">Copy</button>
+        <button data-close>Close</button>
+      </div>
+    </div>
+  </div>
 
-/* IMPORTANT: use contain so base + overlays scale identically */
-#station,
-#stationOverlay,
-#rewardsOverlay{
-  position:absolute; inset:0; width:100%; height:100%;
-  object-fit: contain;          /* <- keep aspect, no distortion */
-  pointer-events:none;
-}
+  <!-- LINKS MODAL -->
+  <div class="modal" id="modal-links" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="links-title">
+      <h2 id="links-title">Official Links</h2>
+      <div class="links-grid">
+        <a id="lnk-buy" class="link-btn" target="_blank" rel="noopener">Buy</a>
+        <a id="lnk-chart" class="link-btn" target="_blank" rel="noopener">Chart</a>
+        <a id="lnk-dextools" class="link-btn" target="_blank" rel="noopener">DEXTools</a>
+        <a id="lnk-telegram" class="link-btn" target="_blank" rel="noopener">Telegram</a>
+        <a id="lnk-twitter" class="link-btn" target="_blank" rel="noopener">X / Twitter</a>
+        <a id="lnk-whitepaper" class="link-btn" target="_blank" rel="noopener">Whitepaper</a>
+      </div>
+      <div class="modal-actions">
+        <button data-close>Close</button>
+      </div>
+    </div>
+  </div>
 
-/* Layer order: base at 0, rewards above base, hover overlay on top */
-#station{ z-index:0; }
-#rewardsOverlay{ z-index:1; }
-#stationOverlay{
-  z-index:2;
-  opacity:0;
-  transition: opacity 0.25s ease-in-out;
-  background: transparent;
-  mix-blend-mode: normal;
-}
+  <!-- TOKENOMICS MODAL -->
+  <div class="modal" id="modal-tokenomics" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="toks-title">
+      <h2 id="toks-title">Tokenomics</h2>
+      <table class="tok-table">
+        <tbody>
+          <tr><th>Total Supply</th><td id="tok-supply"></td></tr>
+          <tr><th>Buy/Sell Tax</th><td id="tok-tax"></td></tr>
+          <tr><th>Liquidity</th><td id="tok-liq"></td></tr>
+        </tbody>
+      </table>
+      <div class="modal-actions">
+        <button data-close>Close</button>
+      </div>
+    </div>
+  </div>
 
-/* Hotspots */
-.hotspot{
-  position:absolute; z-index:9999; pointer-events:auto;
-  background:transparent; border:0; padding:0; margin:0; cursor:pointer;
-  will-change: transform, left, top, width, height;
-}
-
-/* Modals */
-.modal{ position:fixed; inset:0; z-index:10000; display:none; }
-.modal[aria-hidden="false"]{ display:block; }
-.modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(2px); }
-.modal-card{
-  position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
-  background:#0b0b0b; border:1px solid #222; border-radius:12px; color:#fff;
-  min-width:min(92vw,580px); padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.6);
-}
-.modal-card h2{ margin:0 0 10px; font-size:18px; color:var(--bnb-yellow); }
-.modal-card code{
-  display:block; background:#111; border:1px solid #1f1f1f; padding:10px; border-radius:8px; font-size:14px; word-break:break-all;
-}
-.modal-actions{ display:flex; gap:10px; margin-top:14px; }
-.modal-actions button{
-  background:var(--bnb-yellow); color:#000; border:0; border-radius:10px;
-  padding:10px 14px; font-weight:800; letter-spacing:.04em; cursor:pointer;
-}
-.modal-actions button[data-close]{ background:#1c1c1c; color:#eee; border:1px solid #2a2a2a; }
-
-/* Links grid */
-.links-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:6px; }
-.link-btn{ display:block; text-align:center; text-decoration:none; border-radius:10px; padding:12px 10px; background:var(--bnb-yellow); color:#000; font-weight:800; letter-spacing:.04em; }
-
-/* Tokenomics table */
-.tok-table{ width:100%; border-collapse:separate; border-spacing:0 8px; margin-top:6px; }
-.tok-table th,.tok-table td{ padding:10px; border:1px solid #1f1f1f; background:#111; }
-.tok-table th{ color:#ddd; text-align:left; width:38%; }
-.tok-table td{ color:#fff; }
-
-/* Mobile viewport handling */
-@supports (height: 100dvh) { #root { height: 100dvh; } }
-#root { height: 100vh; }
-
-@media (max-width: 640px){
-  .modal-card{ max-height: 90dvh; overflow:auto; padding-bottom: calc(22px + env(safe-area-inset-bottom, 0)); }
-}
-
-/* Focus rings */
-.hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
-  outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
-}
+  <script src="script.js"></script>
+</body>
+</html>
