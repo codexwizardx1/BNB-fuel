@@ -6,7 +6,7 @@
   <title>BNB Fuel</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Preload images -->
+  <!-- ✅ Preload images -->
   <link rel="preload" as="image" href="station_hover_tokenomics.png">
   <link rel="preload" as="image" href="station_hover_contract.png">
   <link rel="preload" as="image" href="station_hover_links.png">
@@ -26,11 +26,11 @@
       <picture id="stationPicture">
         <source srcset="station_mobile_1080x19202.png"
                 media="(max-width: 768px) and (orientation: portrait)" />
-        <!-- Base station image -->
+        <!-- Base station -->
         <img id="station" src="station_on.png" alt="BNB Fuel Station" />
-        <!-- Hover overlay (tokenomics/contract/links) -->
+        <!-- Hover overlay -->
         <img id="stationOverlay" alt="" />
-        <!-- Permanent rewards overlay (always on, above everything, clicks pass through) -->
+        <!-- Always visible rewards overlay -->
         <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
       </picture>
 
