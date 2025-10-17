@@ -10,28 +10,16 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* ✅ Logo in top-left */
+/* Fixed logo (top-left) */
 #logo {
   position: fixed;
   top: 20px;
   left: 20px;
-  height: 160px; /* bigger size */
+  height: 160px; /* adjust to your liking */
   width: auto;
-  z-index: 10001;
-  pointer-events: none; /* not clickable */
-}
-
-/* ✅ Rewards overlay in bottom-right */
-#rewardsOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
   z-index: 10001;
   pointer-events: none;
-  width: auto;
-  height: auto;
 }
-
 
 /* Full viewport + blurred bg */
 #root{ position:fixed; inset:0; overflow:hidden; }
@@ -46,20 +34,23 @@ body{
 /* Stage */
 .stage{ position:absolute; z-index:2; }
 
-/* Base station */
+/* Image stack inside stage */
 #stationPicture{ position:absolute; inset:0; z-index:0; pointer-events:none; }
-#station{
-  position:absolute; inset:0; width:100%; height:100%; object-fit: fill;
-  pointer-events:none; z-index:0;
+
+/* IMPORTANT: use contain so base + overlays scale identically */
+#station,
+#stationOverlay,
+#rewardsOverlay{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit: contain;          /* <- keep aspect, no distortion */
+  pointer-events:none;
 }
 
-/* Overlay image */
+/* Layer order: base at 0, rewards above base, hover overlay on top */
+#station{ z-index:0; }
+#rewardsOverlay{ z-index:1; }
 #stationOverlay{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  object-fit: fill;
-  pointer-events:none;
-  z-index:1;
+  z-index:2;
   opacity:0;
   transition: opacity 0.25s ease-in-out;
   background: transparent;
