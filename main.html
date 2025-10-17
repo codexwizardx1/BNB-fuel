@@ -6,15 +6,20 @@
   <title>BNB Fuel</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- ✅ Preload hover images -->
+  <!-- ✅ Preload images -->
   <link rel="preload" as="image" href="station_hover_tokenomics.png">
   <link rel="preload" as="image" href="station_hover_contract.png">
   <link rel="preload" as="image" href="station_hover_links.png">
   <link rel="preload" as="image" href="station_on.png" />
+  <link rel="preload" as="image" href="station_off.png" />
   <link rel="preload" as="image" href="station_mobile_1080x19202.png" />
+  <link rel="preload" as="image" href="bifuel-logo.png" />
 </head>
 
 <body>
+  <!-- ✅ Logo in top-left corner -->
+  <img src="bifuel-logo.png" alt="BNB Fuel Logo" id="logo">
+
   <div id="root">
     <div class="stage" id="stage">
       <picture id="stationPicture">
@@ -81,7 +86,6 @@
     </div>
   </div>
 
-  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>
