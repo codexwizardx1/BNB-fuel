@@ -126,3 +126,16 @@ body{
     line-height: 1.2;         /* make wrapped text look clean */
   }
 }
+/* ✅ Mobile button alignment fix */
+@media (max-width: 768px) {
+  .link-btn {
+    display: flex;                /* use flexbox */
+    align-items: center;          /* vertical centering */
+    justify-content: center;      /* horizontal centering */
+    font-size: 0.85rem;
+    padding: 0.6em 0.8em;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
+}
