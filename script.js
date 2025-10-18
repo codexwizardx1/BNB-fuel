@@ -20,7 +20,6 @@ const HERO_IMAGES = {
   links: "station_hover_links.png",
 };
 
-// ✅ Preload hero images
 Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
@@ -61,16 +60,16 @@ const MOBILE_ZOOM = 1.3;
 let HS = null;
 
 /*****************
- * ✅ LAYOUT — stretch to full screen
+ * ✅ LAYOUT (original desktop behaviour)
  *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
   const vh = window.visualViewport?.height ? Math.floor(window.visualViewport.height) : window.innerHeight;
+  const iw = stationImg.naturalWidth || 1152;
+  const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // Mobile layout (keep original mapping)
-    const iw = stationImg.naturalWidth || 1080;
-    const ih = stationImg.naturalHeight || 1920;
+    // Mobile
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -92,12 +91,20 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop: fill entire viewport (warp image if needed)
+    // ✅ Desktop — same as original working code
+    const scaleW = vw / iw;
+    const scaleH = vh / ih;
+    const scale = Math.min(scaleW, scaleH); // keeps full image in frame
+    const dispW = Math.round(iw * scale);
+    const dispH = Math.round(ih * scale);
+    const offX = Math.floor((vw - dispW) / 2);
+    const offY = Math.floor((vh - dispH) / 2);
+
     Object.assign(stage.style, {
-      left: 0,
-      top: 0,
-      width: vw + "px",
-      height: vh + "px"
+      left: offX + 'px',
+      top: offY + 'px',
+      width: dispW + 'px',
+      height: dispH + 'px'
     });
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
