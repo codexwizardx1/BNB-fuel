@@ -12,15 +12,23 @@ const LINKS = {
 };
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
+/*****************
+ * HERO IMAGES (desktop + mobile)
+ *****************/
 const HERO_IMAGES = {
   default: "station_on.png",
   off: "station_off.png",
+  mobile_default: "station_mobile_on.png",
+  mobile_off: "station_mobile_off.png",
   tokenomics: "station_hover_tokenomics.png",
   contract: "station_hover_contract.png",
   links: "station_hover_links.png",
 };
 
-Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
+// Preload all images
+Object.values(HERO_IMAGES).forEach((src) => {
+  if (src) new Image().src = src;
+});
 
 /*****************
  * ELEMENTS
@@ -39,7 +47,7 @@ stationImg.addEventListener("load", () => {
 });
 
 /*****************
- * HOTSPOTS MAP
+ * HOTSPOTS
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
@@ -47,12 +55,17 @@ const HS_LANDSCAPE = {
   links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
 };
 
-function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
+function hydrate(map) {
+  Object.values(map).forEach((s) => {
+    s.el = document.getElementById(s.id) || null;
+  });
+}
 
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
-  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
+  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_/i.test(src);
 }
+
 const MOBILE_ZOOM = 1.3;
 
 let HS = null;
@@ -125,11 +138,16 @@ if (window.visualViewport) {
 }
 
 /*****************
- * FLICKER EFFECT (station_off)
+ * FLICKER EFFECT (Desktop + Mobile)
  *****************/
 function setOff(isOff) {
-  stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
+  if (usingPortraitImage()) {
+    stationImg.src = isOff ? HERO_IMAGES.mobile_off : HERO_IMAGES.mobile_default;
+  } else {
+    stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
+  }
 }
+
 let flickerTimer = null;
 let burstTimer = null;
 
