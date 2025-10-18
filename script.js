@@ -67,7 +67,7 @@ const MOBILE_ZOOM = 1.3;
 let HS = null;
 
 /*****************
- * LAYOUT (restored to the original perfect desktop logic)
+ * LAYOUT — height-fit for desktop (your original behavior)
  *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
@@ -76,7 +76,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // ✅ Mobile layout
+    // ✅ Mobile
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -93,13 +93,12 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop: fill width, fit top/bottom, original math
-    const scaleW = vw / iw;
-    const scale = scaleW * 0.9;
-    const dispW = Math.round(iw * scaleW);
-    const dispH = Math.round(ih * scale);
-    const offX = 0;
-    const offY = Math.floor((vh - dispH) / 2);
+    // ✅ Desktop: Fill height, center horizontally (your original behavior)
+    const scaleH = vh / ih;
+    const dispH = vh;
+    const dispW = Math.round(iw * scaleH);
+    const offX = Math.floor((vw - dispW) / 2);
+    const offY = 0;
 
     Object.assign(stage.style, {
       left: offX + 'px',
