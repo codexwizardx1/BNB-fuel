@@ -150,8 +150,12 @@ window.addEventListener("orientationchange", () => {
 function setOff(isOff) {
   const isMobile = usingPortraitImage();
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
-  stationImg.src = isOff ? imgSet.off : imgSet.on;
+  const nextSrc = isOff ? imgSet.off : imgSet.on;
+
+  stationImg.src = nextSrc;
+  setBg(nextSrc); // ✅ update the blurred background
 }
+
 
 let flickerTimer = null;
 let burstTimer = null;
