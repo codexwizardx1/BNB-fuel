@@ -240,8 +240,14 @@ document.querySelectorAll("[data-close]").forEach(el => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY (disabled on mobile)
+ * HOVER IMAGE OVERLAY
  *****************/
+const swapHero = (key) => {
+  const img = HERO_IMAGES[key];
+  if (img) { stationOverlay.src = img; stationOverlay.style.opacity = "1"; }
+};
+const clearHero = () => { stationOverlay.style.opacity = "0"; };
+
 if (!IS_MOBILE) {
   ["tokenomics", "contract", "links"].forEach((key) => {
     const el = document.getElementById(`hs-${key}`);
@@ -251,12 +257,6 @@ if (!IS_MOBILE) {
     }
   });
 }
-
-const swapHero = (key) => {
-  const img = HERO_IMAGES[key];
-  if (img) { stationOverlay.src = img; stationOverlay.style.opacity = "1"; }
-};
-const clearHero = () => { stationOverlay.style.opacity = "0"; };
 
 /*****************
  * FREEZE BG WHEN MODAL OPEN ON MOBILE
