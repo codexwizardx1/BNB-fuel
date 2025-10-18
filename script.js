@@ -41,7 +41,7 @@ const HERO_IMAGES = {
  * ELEMENTS
  *****************/
 const stage = document.getElementById("stage");
-const stationImg = document.getElementById("station");
+const  = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
 function setBg(url) {
@@ -66,7 +66,8 @@ function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getE
 
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
-  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
+ return stationImg.naturalHeight > stationImg.naturalWidth;
+
 }
 const MOBILE_ZOOM = 1.3;
 
