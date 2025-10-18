@@ -73,6 +73,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
+    // ✅ Mobile layout
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -89,11 +90,12 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop full width, correct aspect ratio, no zoom
-    const dispW = vw;
-    const aspectRatio = iw / ih;
-    const dispH = Math.round(dispW / aspectRatio);
-    const offX = 0;
+    // ✅ ORIGINAL DESKTOP LAYOUT (the one that was perfect)
+    const scaleW = vw / iw;
+    const scale = scaleW * 0.9; // 👈 the sweet spot
+    const dispW = Math.round(iw * scale);
+    const dispH = Math.round(ih * scale);
+    const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
     Object.assign(stage.style, {
