@@ -90,20 +90,20 @@ window.layout = function layout() {
       contract:  remap(HS_LANDSCAPE.contract),
       links:     remap(HS_LANDSCAPE.links),
     };
-   } else {
-    // 🖥 Desktop layout — actual zoom out + width fill
+  } else {
+    // 🖥 Desktop layout — zoom out but stretch width to fill screen
     const scaleW = vw / iw;
     const scaleH = vh / ih;
-    let scale = Math.max(scaleW, scaleH) * 0.92; // 👈 this controls zoom-out
+    let scale = Math.max(scaleW, scaleH) * 0.92; // 👈 zoom out control
+
     let dispW = Math.round(iw * scale);
     let dispH = Math.round(ih * scale);
 
-    // 👇 Stretch width only horizontally to fill screen
+    // stretch width only if needed
     if (dispW < vw) {
       const stretchFactor = vw / dispW;
       dispW = vw;
-      // ❌ do not scale height too — this keeps zoom-out visible
-      // dispH = Math.round(dispH * stretchFactor);
+      // ⚠️ don't touch height — keep zoom-out effect
     }
 
     const offX = Math.floor((vw - dispW) / 2);
