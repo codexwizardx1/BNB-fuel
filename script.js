@@ -13,14 +13,29 @@ const LINKS = {
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
 const HERO_IMAGES = {
-  default: "station_on.png",
-  off: "station_off.png",
+  desktop: {
+    on: "station_on.png",
+    off: "station_off.png",
+  },
+  mobile: {
+    on: "station_mobile_on.png",
+    off: "station_mobile_off.png",
+  },
   tokenomics: "station_hover_tokenomics.png",
   contract: "station_hover_contract.png",
   links: "station_hover_links.png",
 };
 
-Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
+
+[
+  HERO_IMAGES.desktop.on,
+  HERO_IMAGES.desktop.off,
+  HERO_IMAGES.mobile.on,
+  HERO_IMAGES.mobile.off,
+  HERO_IMAGES.tokenomics,
+  HERO_IMAGES.contract,
+  HERO_IMAGES.links
+].forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
  * ELEMENTS
@@ -123,13 +138,20 @@ if (window.visualViewport) {
   visualViewport.addEventListener("resize", layout);
   visualViewport.addEventListener("scroll", layout);
 }
+window.addEventListener("orientationchange", () => {
+  stopFlicker();
+  startFlicker();
+});
 
 /*****************
  * FLICKER EFFECT (station_off)
  *****************/
 function setOff(isOff) {
-  stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
+  const isMobile = usingPortraitImage();
+  const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
+  stationImg.src = isOff ? imgSet.off : imgSet.on;
 }
+
 let flickerTimer = null;
 let burstTimer = null;
 
