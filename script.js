@@ -48,7 +48,7 @@ const stationOverlay = document.getElementById("stationOverlay");
  * MOBILE / DESKTOP DETECTION
  *****************/
 function isPortraitDevice() {
-  // ✅ Reliable mobile check
+  // ✅ More reliable on Safari
   if (window.matchMedia("(orientation: portrait)").matches) return true;
   if (window.innerHeight >= window.innerWidth) return true;
   return false;
@@ -64,11 +64,11 @@ function getInitialStationImage() {
  * INITIAL IMAGE SETUP
  *****************/
 const initialImg = getInitialStationImage();
-stationImg.src = initialImg + "?v=" + Date.now(); // cache-buster
+stationImg.src = initialImg + "?v=" + Date.now(); // cache-buster ONLY on first load
 setBg(initialImg);
 
 function setBg(url) {
-  document.documentElement.style.setProperty("--bg-url", `url("${url}?v=${Date.now()}")`);
+  document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
 }
 
 stationImg.addEventListener("load", () => {
@@ -91,7 +91,7 @@ function usingPortraitImage() {
   return stationImg.naturalHeight > stationImg.naturalWidth;
 }
 
-const MOBILE_ZOOM = 1.3;
+const MOBILE_ZOOM = 1.0; // ✅ Mobile images are already perfectly sized
 let HS = null;
 
 window.layout = function layout() {
@@ -101,8 +101,8 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    const contain = Math.min(vw / iw, vh / ih);
-    const scale = contain * MOBILE_ZOOM;
+    // ✅ Scale to full width for mobile, no squashing or gaps
+    const scale = (vw / iw) * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX = Math.floor((vw - dispW) / 2);
@@ -117,6 +117,7 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
+    // ✅ Desktop layout stays EXACTLY as it was
     const scaleW = vw / iw;
     const scale = scaleW * 0.9;
     const dispW = Math.round(iw * scaleW);
@@ -166,12 +167,12 @@ window.addEventListener("orientationchange", () => {
 });
 
 /*****************
- * FLICKER EFFECT
+ * FLICKER EFFECT — restored to original for desktop
  *****************/
 function setOff(isOff) {
   const isMobile = usingPortraitImage();
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
-  const nextSrc = (isOff ? imgSet.off : imgSet.on) + "?v=" + Date.now(); // cache-buster
+  const nextSrc = isOff ? imgSet.off : imgSet.on;
   stationImg.src = nextSrc;
   setBg(nextSrc);
 }
