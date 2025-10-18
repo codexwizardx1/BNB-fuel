@@ -116,3 +116,13 @@ body{
 .hotspot:focus-visible, .modal-actions button:focus-visible, .link-btn:focus-visible{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
+/* ✅ Fix link buttons on mobile */
+@media (max-width: 768px) {
+  .link-btn {
+    font-size: 0.85rem;       /* slightly smaller text */
+    padding: 0.6em 0.8em;     /* reduce padding */
+    white-space: normal;      /* allow wrapping if needed */
+    text-align: center;       /* center wrapped text */
+    line-height: 1.2;         /* make wrapped text look clean */
+  }
+}
