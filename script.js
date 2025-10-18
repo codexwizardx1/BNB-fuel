@@ -60,7 +60,7 @@ const MOBILE_ZOOM = 1.3;
 let HS = null;
 
 /*****************
- * ✅ LAYOUT — DESKTOP ONLY CHANGED
+ * LAYOUT
  *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
@@ -69,7 +69,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // 📱 MOBILE — leave exactly as it was before
+    // 📱 Mobile layout — unchanged
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -91,10 +91,10 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // 🖥 DESKTOP — restore the old “fills screen” scaling
+    // 🖥 Desktop layout — fill screen but slightly zoomed out
     const scaleW = vw / iw;
     const scaleH = vh / ih;
-    const scale = Math.max(scaleW, scaleH); // fill entire screen, no black bars
+    const scale = Math.max(scaleW, scaleH) * 0.97; // 👈 zoom out slightly
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
     const offX = Math.floor((vw - dispW) / 2);
