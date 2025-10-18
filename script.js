@@ -47,21 +47,16 @@ const HS_LANDSCAPE = {
   links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
 };
 
-function hydrate(map) {
-  Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; });
-}
+function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
 
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-
 const MOBILE_ZOOM = 1.3;
+
 let HS = null;
 
-/*****************
- * LAYOUT
- *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
   const vh = window.visualViewport?.height ? Math.floor(window.visualViewport.height) : window.innerHeight;
@@ -69,7 +64,6 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // 📱 Mobile layout — unchanged
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -77,12 +71,7 @@ window.layout = function layout() {
     const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, {
-      left: offX + "px",
-      top: offY + "px",
-      width: dispW + "px",
-      height: dispH + "px"
-    });
+    Object.assign(stage.style, { left: offX + "px", top: offY + "px", width: dispW + "px", height: dispH + "px" });
 
     const remap = (v) => v ? ({ ...v, y: 0.3125 + 0.375 * v.y, h: 0.375 * v.h }) : null;
     HS = {
@@ -91,33 +80,23 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // 🖥 Desktop layout — force width to fill, keep height from changing
     const scaleW = vw / iw;
-    const scaleH = vh / ih;
-    let baseScale = Math.max(scaleW, scaleH) * 0.92; // controls zoom level
-    let dispW = vw; // 👈 always stretch width to viewport
-    let dispH = Math.round(ih * baseScale); // 👈 height based on zoom
-
-    // ✅ do NOT change dispH based on width — keep the zoom-out look
-    const offX = 0; // forced to fill
+    const scale = scaleW * 0.9;
+    const dispW = Math.round(iw * scaleW);
+    const dispH = Math.round(ih * scale);
+    const offX = 0;
     const offY = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, {
-      left: offX + 'px',
-      top: offY + 'px',
-      width: dispW + 'px',
-      height: dispH + 'px'
-    });
-
+    Object.assign(stage.style, { left: offX + 'px', top: offY + 'px', width: dispW + 'px', height: dispH + 'px' });
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
   }
-
 
   hydrate(HS);
   const rect = stage.getBoundingClientRect();
   const dispW = rect.width;
   const dispH = rect.height;
-  Object.values(HS).filter(s => s && s.el).forEach(spec => place(spec, dispW, dispH));
+
+  Object.values(HS).filter((s)=>s && s.el).forEach((spec) => place(spec, dispW, dispH));
 };
 
 function place(spec, dispW, dispH) {
@@ -146,7 +125,7 @@ if (window.visualViewport) {
 }
 
 /*****************
- * FLICKER EFFECT
+ * FLICKER EFFECT (station_off)
  *****************/
 function setOff(isOff) {
   stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
@@ -177,12 +156,13 @@ function startFlicker() {
 }
 
 startFlicker();
+
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && !flickerTimer && !burstTimer) startFlicker();
 });
 
 /*****************
- * MODALS
+ * MODALS + DATA
  *****************/
 const mContract = document.getElementById("modal-contract");
 const mLinks    = document.getElementById("modal-links");
