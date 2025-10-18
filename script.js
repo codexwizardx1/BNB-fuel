@@ -94,7 +94,7 @@ window.layout = function layout() {
     // 🖥 Desktop layout — fill screen and zoom out slightly
     const scaleW = vw / iw;
     const scaleH = vh / ih;
-    let scale = Math.max(scaleW, scaleH) * 0.95; // 👈 slightly more zoom out
+    let scale = Math.max(scaleW, scaleH) * 0.93; // 👈 slightly more zoom out
 
     let dispW = Math.round(iw * scale);
     let dispH = Math.round(ih * scale);
