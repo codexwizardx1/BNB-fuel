@@ -91,22 +91,15 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // 🖥 Desktop layout — zoom out but stretch width to fill screen
+    // 🖥 Desktop layout — force width to fill, keep height from changing
     const scaleW = vw / iw;
     const scaleH = vh / ih;
-    let scale = Math.max(scaleW, scaleH) * 0.92; // 👈 zoom out control
+    let baseScale = Math.max(scaleW, scaleH) * 0.92; // controls zoom level
+    let dispW = vw; // 👈 always stretch width to viewport
+    let dispH = Math.round(ih * baseScale); // 👈 height based on zoom
 
-    let dispW = Math.round(iw * scale);
-    let dispH = Math.round(ih * scale);
-
-    // stretch width only if needed
-    if (dispW < vw) {
-      const stretchFactor = vw / dispW;
-      dispW = vw;
-      // ⚠️ don't touch height — keep zoom-out effect
-    }
-
-    const offX = Math.floor((vw - dispW) / 2);
+    // ✅ do NOT change dispH based on width — keep the zoom-out look
+    const offX = 0; // forced to fill
     const offY = Math.floor((vh - dispH) / 2);
 
     Object.assign(stage.style, {
@@ -118,6 +111,7 @@ window.layout = function layout() {
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
   }
+
 
   hydrate(HS);
   const rect = stage.getBoundingClientRect();
