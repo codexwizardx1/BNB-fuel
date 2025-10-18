@@ -12,7 +12,8 @@
   <link rel="preload" as="image" href="station_hover_links.png">
   <link rel="preload" as="image" href="station_on.png" />
   <link rel="preload" as="image" href="station_off.png" />
-  <link rel="preload" as="image" href="station_mobile_1080x19202.png" />
+  <link rel="preload" as="image" href="station_mobile_on.png" />
+  <link rel="preload" as="image" href="station_mobile_off.png" />
   <link rel="preload" as="image" href="bifuel-logo.png" />
   <link rel="preload" as="image" href="rewards.png" />
 </head>
@@ -23,16 +24,10 @@
 
   <div id="root">
     <div class="stage" id="stage">
-      <picture id="stationPicture">
-        <source srcset="station_mobile_1080x19202.png"
-                media="(max-width: 768px) and (orientation: portrait)" />
-        <!-- Base station -->
-        <img id="station" src="station_on.png" alt="BNB Fuel Station" />
-        <!-- Hover overlay -->
-        <img id="stationOverlay" alt="" />
-        <!-- Always visible rewards overlay -->
-        <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
-      </picture>
+      <!-- ✅ removed <source> so JS can fully control mobile flicker -->
+      <img id="station" src="station_on.png" alt="BNB Fuel Station" />
+      <img id="stationOverlay" alt="" />
+      <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
 
       <!-- Hotspots -->
       <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
