@@ -90,11 +90,19 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ ORIGINAL DESKTOP LAYOUT (the one that was perfect)
-    const scaleW = vw / iw;
-    const scale = scaleW * 0.9; // 👈 the sweet spot
-    const dispW = Math.round(iw * scale);
-    const dispH = Math.round(ih * scale);
+    // ✅ Desktop: fill top, bottom, AND width (no black edges)
+    const imgRatio = iw / ih;
+    const viewRatio = vw / vh;
+
+    let dispW, dispH;
+    if (viewRatio > imgRatio) {
+      dispH = vh;
+      dispW = Math.round(vh * imgRatio);
+    } else {
+      dispW = vw;
+      dispH = Math.round(vw / imgRatio);
+    }
+
     const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
