@@ -12,19 +12,15 @@ const LINKS = {
 };
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
-/*****************
- * HERO IMAGES
- *****************/
 const HERO_IMAGES = {
   default: "station_on.png",
   off: "station_off.png",
-  mobile_default: "station_mobile_on.png",
-  mobile_off: "station_mobile_off.png",
   tokenomics: "station_hover_tokenomics.png",
   contract: "station_hover_contract.png",
   links: "station_hover_links.png",
 };
 
+// ✅ Preload hero images
 Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
@@ -34,21 +30,17 @@ const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
-// ✅ set correct initial image
-if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
-  stationImg.src = HERO_IMAGES.mobile_default;
-} else {
-  stationImg.src = HERO_IMAGES.default;
-}
-
 function setBg(url) {
   document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
 }
 setBg(stationImg.currentSrc || stationImg.src);
-stationImg.addEventListener("load", () => { setBg(stationImg.currentSrc || stationImg.src); layout(); });
+stationImg.addEventListener("load", () => {
+  setBg(stationImg.currentSrc || stationImg.src);
+  layout();
+});
 
 /*****************
- * HOTSPOTS
+ * HOTSPOTS MAP
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
@@ -57,16 +49,20 @@ const HS_LANDSCAPE = {
 };
 
 function hydrate(map) {
-  Object.values(map).forEach((s) => s.el = document.getElementById(s.id) || null);
+  Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; });
 }
 
 function usingPortraitImage() {
-  return window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
+  const src = stationImg.currentSrc || stationImg.src;
+  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
 
 const MOBILE_ZOOM = 1.3;
 let HS = null;
 
+/*****************
+ * ✅ LAYOUT — desktop with slight zoom out
+ *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
   const vh = window.visualViewport?.height ? Math.floor(window.visualViewport.height) : window.innerHeight;
@@ -74,6 +70,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
+    // Mobile layout
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -81,23 +78,34 @@ window.layout = function layout() {
     const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, { left: offX + "px", top: offY + "px", width: dispW + "px", height: dispH + "px" });
+    Object.assign(stage.style, {
+      left: offX + "px",
+      top: offY + "px",
+      width: dispW + "px",
+      height: dispH + "px"
+    });
 
     const remap = (v) => v ? ({ ...v, y: 0.3125 + 0.375 * v.y, h: 0.375 * v.h }) : null;
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
-      contract: remap(HS_LANDSCAPE.contract),
-      links: remap(HS_LANDSCAPE.links),
+      contract:  remap(HS_LANDSCAPE.contract),
+      links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    const scaleW = vw / iw;
-    const scale = scaleW * 1;  // ✅ full width restored
-    const dispW = Math.round(iw * scaleW);
-    const dispH = Math.round(ih * scale);
-    const offX = 0;
+    // ✅ Desktop — slightly zoomed out (0.97 scale)
+    const scaleH = (vh / ih) * 0.97;
+    const dispH = Math.round(ih * scaleH);
+    const dispW = Math.round(iw * scaleH);
+    const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, { left: offX + 'px', top: offY + 'px', width: dispW + 'px', height: dispH + 'px' });
+    Object.assign(stage.style, {
+      left: offX + 'px',
+      top: offY + 'px',
+      width: dispW + 'px',
+      height: dispH + 'px'
+    });
+
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
   }
 
@@ -117,8 +125,8 @@ function place(spec, dispW, dispH) {
   Object.assign(spec.el.style, {
     position: "absolute",
     left: x - w / 2 + "px",
-    top: y - h / 2 + "px",
-    width: w + "px",
+    top:  y - h / 2 + "px",
+    width:  w + "px",
     height: h + "px",
     transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`,
     willChange: "transform, left, top, width, height"
@@ -137,13 +145,8 @@ if (window.visualViewport) {
  * FLICKER EFFECT
  *****************/
 function setOff(isOff) {
-  if (usingPortraitImage()) {
-    stationImg.src = isOff ? HERO_IMAGES.mobile_off : HERO_IMAGES.mobile_default;
-  } else {
-    stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
-  }
+  stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
 }
-
 let flickerTimer = null;
 let burstTimer = null;
 
@@ -175,7 +178,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 /*****************
- * MODALS + DATA
+ * MODALS
  *****************/
 const mContract = document.getElementById("modal-contract");
 const mLinks    = document.getElementById("modal-links");
