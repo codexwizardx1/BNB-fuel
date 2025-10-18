@@ -66,6 +66,9 @@ function usingPortraitImage() {
 const MOBILE_ZOOM = 1.3;
 let HS = null;
 
+/*****************
+ * LAYOUT (restored to the original perfect desktop logic)
+ *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
   const vh = window.visualViewport?.height ? Math.floor(window.visualViewport.height) : window.innerHeight;
@@ -90,20 +93,12 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop: fill top, bottom, AND width (no black edges)
-    const imgRatio = iw / ih;
-    const viewRatio = vw / vh;
-
-    let dispW, dispH;
-    if (viewRatio > imgRatio) {
-      dispH = vh;
-      dispW = Math.round(vh * imgRatio);
-    } else {
-      dispW = vw;
-      dispH = Math.round(vw / imgRatio);
-    }
-
-    const offX = Math.floor((vw - dispW) / 2);
+    // ✅ Desktop: fill width, fit top/bottom, original math
+    const scaleW = vw / iw;
+    const scale = scaleW * 0.9;
+    const dispW = Math.round(iw * scaleW);
+    const dispH = Math.round(ih * scale);
+    const offX = 0;
     const offY = Math.floor((vh - dispH) / 2);
 
     Object.assign(stage.style, {
@@ -190,7 +185,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 /*****************
- * MODALS + DATA
+ * MODALS
  *****************/
 const mContract = document.getElementById("modal-contract");
 const mLinks    = document.getElementById("modal-links");
