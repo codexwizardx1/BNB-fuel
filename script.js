@@ -240,24 +240,34 @@ document.querySelectorAll("[data-close]").forEach(el => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY
+ * HOVER IMAGE OVERLAY + LOCKING
  *****************/
+let isOverlayLocked = false;
+
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
-  if (img) { stationOverlay.src = img; stationOverlay.style.opacity = "1"; }
+  if (img) {
+    stationOverlay.src = img;
+    stationOverlay.style.opacity = "1";
+  }
 };
-const clearHero = () => { stationOverlay.style.opacity = "0"; };
+const clearHero = () => {
+  if (!isOverlayLocked) {
+    stationOverlay.style.opacity = "0";
+  }
+};
 
 if (!IS_MOBILE) {
   ["tokenomics", "contract", "links"].forEach((key) => {
     const el = document.getElementById(`hs-${key}`);
     if (el && HERO_IMAGES[key]) {
       el.addEventListener("mouseenter", () => swapHero(key));
-      el.addEventListener("mouseleave", clearHero);
+      el.addEventListener("mouseleave", () => {
+        if (!isOverlayLocked) clearHero();
+      });
     }
   });
 
-  // ✅ Keep overlay locked while modal is open
   const modalOverlayMap = {
     "hs-tokenomics": "tokenomics",
     "hs-contract": "contract",
@@ -269,13 +279,17 @@ if (!IS_MOBILE) {
     if (el) {
       el.addEventListener("click", () => {
         const key = modalOverlayMap[id];
-        if (key) swapHero(key);
+        if (key) {
+          swapHero(key);
+          isOverlayLocked = true;
+        }
       });
     }
   });
 
   document.querySelectorAll("[data-close]").forEach(btn => {
     btn.addEventListener("click", () => {
+      isOverlayLocked = false;
       clearHero();
     });
   });
