@@ -20,8 +20,8 @@ const HERO_IMAGES = {
   links: "station_hover_links.png",
 };
 
-// Preload all hero images
-Object.values(HERO_IMAGES).forEach(src => { if (src) new Image().src = src; });
+// ✅ Preload hero images
+Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
  * ELEMENTS
@@ -48,18 +48,20 @@ const HS_LANDSCAPE = {
   links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
 };
 
-function hydrate(map) { Object.values(map).forEach(s => s.el = document.getElementById(s.id) || null); }
+function hydrate(map) {
+  Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; });
+}
 
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-const MOBILE_ZOOM = 1.3;
 
+const MOBILE_ZOOM = 1.3;
 let HS = null;
 
 /*****************
- * LAYOUT (original desktop scaling)
+ * ✅ LAYOUT — original desktop fill
  *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
@@ -68,7 +70,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // Mobile: use contain scaling with zoom factor
+    // Mobile layout
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -76,7 +78,12 @@ window.layout = function layout() {
     const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, { left: offX + "px", top: offY + "px", width: dispW + "px", height: dispH + "px" });
+    Object.assign(stage.style, {
+      left: offX + "px",
+      top: offY + "px",
+      width: dispW + "px",
+      height: dispH + "px"
+    });
 
     const remap = (v) => v ? ({ ...v, y: 0.3125 + 0.375 * v.y, h: 0.375 * v.h }) : null;
     HS = {
@@ -85,7 +92,7 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop: height-fit scaling (your original behavior)
+    // ✅ Desktop — height-based scaling (fills screen perfectly)
     const scaleH = vh / ih;
     const dispH = vh;
     const dispW = Math.round(iw * scaleH);
