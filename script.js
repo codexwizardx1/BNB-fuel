@@ -42,16 +42,23 @@ const HERO_IMAGES = {
  *****************/
 const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
-// Pick correct starting image for desktop or mobile
+
+// detect if device is in portrait mode BEFORE any image is loaded
+function isPortraitDevice() {
+  return window.innerHeight > window.innerWidth;
+}
+
+// pick correct image for startup
 function getInitialStationImage() {
-  const isMobile = usingPortraitImage();
+  const isMobile = isPortraitDevice(); // ✅ use screen size, not image size
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
   return imgSet.on;
 }
 
-// Set the correct image on first load
+// set the image and background when page first loads
 stationImg.src = getInitialStationImage();
 setBg(stationImg.src);
+
 
 const stationOverlay = document.getElementById("stationOverlay");
 
