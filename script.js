@@ -61,16 +61,16 @@ const MOBILE_ZOOM = 1.3;
 let HS = null;
 
 /*****************
- * ✅ LAYOUT — desktop with slight zoom out
+ * ✅ LAYOUT — stretch to full screen
  *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
   const vh = window.visualViewport?.height ? Math.floor(window.visualViewport.height) : window.innerHeight;
-  const iw = stationImg.naturalWidth || 1152;
-  const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // Mobile layout
+    // Mobile layout (keep original mapping)
+    const iw = stationImg.naturalWidth || 1080;
+    const ih = stationImg.naturalHeight || 1920;
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -92,18 +92,12 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop — slightly zoomed out (0.97 scale)
-    const scaleH = (vh / ih) * 0.97;
-    const dispH = Math.round(ih * scaleH);
-    const dispW = Math.round(iw * scaleH);
-    const offX = Math.floor((vw - dispW) / 2);
-    const offY = Math.floor((vh - dispH) / 2);
-
+    // ✅ Desktop: fill entire viewport (warp image if needed)
     Object.assign(stage.style, {
-      left: offX + 'px',
-      top: offY + 'px',
-      width: dispW + 'px',
-      height: dispH + 'px'
+      left: 0,
+      top: 0,
+      width: vw + "px",
+      height: vh + "px"
     });
 
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
