@@ -91,12 +91,22 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // 🖥 Desktop layout — fill screen but slightly zoomed out
+    // 🖥 Desktop layout — fill screen and zoom out slightly
     const scaleW = vw / iw;
     const scaleH = vh / ih;
-    const scale = Math.max(scaleW, scaleH) * 0.97; // 👈 zoom out slightly
-    const dispW = Math.round(iw * scale);
-    const dispH = Math.round(ih * scale);
+    let scale = Math.max(scaleW, scaleH) * 0.95; // 👈 slightly more zoom out
+
+    let dispW = Math.round(iw * scale);
+    let dispH = Math.round(ih * scale);
+
+    // 👇 Force width stretch to fill edge
+    if (dispW < vw) {
+      const stretchFactor = vw / dispW;
+      dispW = vw;
+      dispH = Math.round(dispH * stretchFactor);
+      scale = dispW / iw;
+    }
+
     const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
