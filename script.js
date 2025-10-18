@@ -26,7 +26,7 @@ const HERO_IMAGES = {
   links: "station_hover_links.png",
 };
 
-
+// Preload images
 [
   HERO_IMAGES.desktop.on,
   HERO_IMAGES.desktop.off,
@@ -42,30 +42,39 @@ const HERO_IMAGES = {
  *****************/
 const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
+const stationOverlay = document.getElementById("stationOverlay");
 
-// detect if device is in portrait mode BEFORE any image is loaded
+/**
+ * ✅ Detect screen orientation before any image is loaded
+ */
 function isPortraitDevice() {
   return window.innerHeight > window.innerWidth;
 }
 
-// pick correct image for startup
+/**
+ * ✅ Pick correct image for startup (desktop vs mobile)
+ */
 function getInitialStationImage() {
-  const isMobile = isPortraitDevice(); // ✅ use screen size, not image size
+  const isMobile = isPortraitDevice();
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
   return imgSet.on;
 }
 
-// set the image and background when page first loads
-stationImg.src = getInitialStationImage();
-setBg(stationImg.src);
+/**
+ * ✅ Set the initial image before rendering
+ */
+const initialImg = getInitialStationImage();
+stationImg.src = initialImg;
+setBg(initialImg);
 
-
-const stationOverlay = document.getElementById("stationOverlay");
-
+/**
+ * ✅ Update background blur image helper
+ */
 function setBg(url) {
   document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
 }
-setBg(stationImg.currentSrc || stationImg.src);
+
+// once the image loads, re-sync layout and blur
 stationImg.addEventListener("load", () => {
   setBg(stationImg.currentSrc || stationImg.src);
   layout();
@@ -82,12 +91,14 @@ const HS_LANDSCAPE = {
 
 function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
 
+/**
+ * Used later to detect current orientation based on image aspect ratio
+ */
 function usingPortraitImage() {
-  const src = stationImg.currentSrc || stationImg.src;
   return stationImg.naturalHeight > stationImg.naturalWidth;
 }
-const MOBILE_ZOOM = 1.3;
 
+const MOBILE_ZOOM = 1.3;
 let HS = null;
 
 window.layout = function layout() {
@@ -162,12 +173,14 @@ window.addEventListener("orientationchange", () => {
 });
 
 /*****************
- * FLICKER EFFECT (station_off)
+ * FLICKER EFFECT
  *****************/
 function setOff(isOff) {
   const isMobile = usingPortraitImage();
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
-  stationImg.src = isOff ? imgSet.off : imgSet.on;
+  const nextSrc = isOff ? imgSet.off : imgSet.on;
+  stationImg.src = nextSrc;
+  setBg(nextSrc); // keep blur in sync
 }
 
 let flickerTimer = null;
