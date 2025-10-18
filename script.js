@@ -42,6 +42,17 @@ const HERO_IMAGES = {
  *****************/
 const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
+// Pick correct starting image for desktop or mobile
+function getInitialStationImage() {
+  const isMobile = usingPortraitImage();
+  const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
+  return imgSet.on;
+}
+
+// Set the correct image on first load
+stationImg.src = getInitialStationImage();
+setBg(stationImg.src);
+
 const stationOverlay = document.getElementById("stationOverlay");
 
 function setBg(url) {
@@ -66,7 +77,7 @@ function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getE
 
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
-  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
+  return stationImg.naturalHeight > stationImg.naturalWidth;
 }
 const MOBILE_ZOOM = 1.3;
 
