@@ -41,7 +41,7 @@ const HERO_IMAGES = {
  * ELEMENTS
  *****************/
 const stage = document.getElementById("stage");
-const  = document.getElementById("station");
+const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
 function setBg(url) {
@@ -66,8 +66,7 @@ function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getE
 
 function usingPortraitImage() {
   const src = stationImg.currentSrc || stationImg.src;
- return stationImg.naturalHeight > stationImg.naturalWidth;
-
+  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
 const MOBILE_ZOOM = 1.3;
 
@@ -150,12 +149,8 @@ window.addEventListener("orientationchange", () => {
 function setOff(isOff) {
   const isMobile = usingPortraitImage();
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
-  const nextSrc = isOff ? imgSet.off : imgSet.on;
-
-  stationImg.src = nextSrc;
-  setBg(nextSrc); // ✅ update the blurred background
+  stationImg.src = isOff ? imgSet.off : imgSet.on;
 }
-
 
 let flickerTimer = null;
 let burstTimer = null;
