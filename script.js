@@ -45,7 +45,7 @@ const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
 /*****************
- * MOBILE / DESKTOP DETECTION — once only
+ * MOBILE / DESKTOP DETECTION
  *****************/
 function detectMobile() {
   if (window.matchMedia("(orientation: portrait)").matches) return true;
@@ -66,7 +66,7 @@ if (IS_MOBILE) {
  * INITIAL IMAGE SETUP
  *****************/
 const initialImg = IS_MOBILE ? HERO_IMAGES.mobile.on : HERO_IMAGES.desktop.on;
-stationImg.src = initialImg + "?v=" + Date.now(); // cache-buster only on first load
+stationImg.src = initialImg + "?v=" + Date.now(); // cache-buster for first load
 setBg(initialImg);
 
 function setBg(url) {
@@ -99,7 +99,6 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (IS_MOBILE) {
-    // ✅ Mobile layout fixed
     const scale = (vw / iw) * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
@@ -115,7 +114,6 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop untouched
     const scaleW = vw / iw;
     const scale = scaleW * 0.9;
     const dispW = Math.round(iw * scaleW);
@@ -240,67 +238,57 @@ document.querySelectorAll("[data-close]").forEach(el => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY + LOCKING
+ * HOVER IMAGE OVERLAY + LOCKING (final)
  *****************/
 let isOverlayLocked = false;
 
-const swapHero = (key) => {
+function showOverlay(key) {
   const img = HERO_IMAGES[key];
   if (img) {
     stationOverlay.src = img;
     stationOverlay.style.opacity = "1";
   }
-};
-const clearHero = () => {
-  if (!isOverlayLocked) {
-    stationOverlay.style.opacity = "0";
-  } else {
-    stationOverlay.style.opacity = "0";
-  }
-};
+}
+
+function hideOverlay(force = false) {
+  if (isOverlayLocked && !force) return;
+  stationOverlay.style.opacity = "0";
+}
 
 if (!IS_MOBILE) {
+  // Hover behavior
   ["tokenomics", "contract", "links"].forEach((key) => {
     const el = document.getElementById(`hs-${key}`);
-    if (el && HERO_IMAGES[key]) {
-      el.addEventListener("mouseenter", () => swapHero(key));
-      el.addEventListener("mouseleave", () => {
-        if (!isOverlayLocked) clearHero();
-      });
-    }
+    if (!el || !HERO_IMAGES[key]) return;
+
+    el.addEventListener("mouseenter", () => showOverlay(key));
+    el.addEventListener("mouseleave", () => hideOverlay());
   });
 
+  // Lock overlay on modal open
   const modalOverlayMap = {
     "hs-tokenomics": "tokenomics",
     "hs-contract": "contract",
-    "hs-links": "links"
+    "hs-links": "links",
   };
 
   ["hs-contract", "hs-links", "hs-tokenomics"].forEach((id) => {
     const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("click", () => {
-        const key = modalOverlayMap[id];
-        if (key) {
-          swapHero(key);
-          isOverlayLocked = true;
-        }
-      });
-    }
-  });
+    if (!el) return;
 
-  // 🪄 remove lock on click but clear after transition end
-  document.querySelectorAll("[data-close]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      isOverlayLocked = false;
+    el.addEventListener("click", () => {
+      const key = modalOverlayMap[id];
+      if (!key) return;
+      isOverlayLocked = true;
+      showOverlay(key);
     });
   });
 
-  document.querySelectorAll(".modal").forEach(modal => {
-    modal.addEventListener("transitionend", () => {
-      if (modal.getAttribute("aria-hidden") === "true") {
-        clearHero();
-      }
+  // Force clear on modal close
+  document.querySelectorAll("[data-close]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      isOverlayLocked = false;
+      hideOverlay(true);
     });
   });
 }
