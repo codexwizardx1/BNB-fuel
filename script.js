@@ -26,7 +26,7 @@ const HERO_IMAGES = {
   links: "station_hover_links.png",
 };
 
-// ✅ Preload all images
+// Preload images
 [
   HERO_IMAGES.desktop.on,
   HERO_IMAGES.desktop.off,
@@ -45,31 +45,30 @@ const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
 /*****************
- * ORIENTATION DETECTION (reliable)
+ * MOBILE / DESKTOP DETECTION
  *****************/
 function isPortraitDevice() {
-  return window.matchMedia("(orientation: portrait)").matches;
+  // ✅ Reliable mobile check
+  if (window.matchMedia("(orientation: portrait)").matches) return true;
+  if (window.innerHeight >= window.innerWidth) return true;
+  return false;
 }
 
-/*****************
- * INITIAL IMAGE SELECTION
- *****************/
 function getInitialStationImage() {
   const isMobile = isPortraitDevice();
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
   return imgSet.on;
 }
 
+/*****************
+ * INITIAL IMAGE SETUP
+ *****************/
 const initialImg = getInitialStationImage();
-console.log("🧭 Initial image chosen:", initialImg);
-stationImg.src = initialImg;
+stationImg.src = initialImg + "?v=" + Date.now(); // cache-buster
 setBg(initialImg);
 
-/*****************
- * BACKGROUND BLUR HELPER
- *****************/
 function setBg(url) {
-  document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
+  document.documentElement.style.setProperty("--bg-url", `url("${url}?v=${Date.now()}")`);
 }
 
 stationImg.addEventListener("load", () => {
@@ -86,13 +85,8 @@ const HS_LANDSCAPE = {
   links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
 };
 
-function hydrate(map) {
-  Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; });
-}
+function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
 
-/*****************
- * DETECT CURRENT IMAGE ORIENTATION
- *****************/
 function usingPortraitImage() {
   return stationImg.naturalHeight > stationImg.naturalWidth;
 }
@@ -139,7 +133,7 @@ window.layout = function layout() {
   const dispW = rect.width;
   const dispH = rect.height;
 
-  Object.values(HS).filter((s) => s && s.el).forEach((spec) => place(spec, dispW, dispH));
+  Object.values(HS).filter((s)=>s && s.el).forEach((spec) => place(spec, dispW, dispH));
 };
 
 function place(spec, dispW, dispH) {
@@ -151,8 +145,8 @@ function place(spec, dispW, dispH) {
   Object.assign(spec.el.style, {
     position: "absolute",
     left: x - w / 2 + "px",
-    top: y - h / 2 + "px",
-    width: w + "px",
+    top:  y - h / 2 + "px",
+    width:  w + "px",
     height: h + "px",
     transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`,
     willChange: "transform, left, top, width, height"
@@ -177,9 +171,9 @@ window.addEventListener("orientationchange", () => {
 function setOff(isOff) {
   const isMobile = usingPortraitImage();
   const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
-  const nextSrc = isOff ? imgSet.off : imgSet.on;
+  const nextSrc = (isOff ? imgSet.off : imgSet.on) + "?v=" + Date.now(); // cache-buster
   stationImg.src = nextSrc;
-  setBg(nextSrc); // keep blur in sync
+  setBg(nextSrc);
 }
 
 let flickerTimer = null;
