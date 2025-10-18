@@ -55,6 +55,14 @@ function detectMobile() {
 const IS_MOBILE = detectMobile();
 
 /*****************
+ * REMOVE REWARDS ON MOBILE
+ *****************/
+if (IS_MOBILE) {
+  const rewardsEl = document.getElementById("rewardsOverlay");
+  if (rewardsEl) rewardsEl.remove();
+}
+
+/*****************
  * INITIAL IMAGE SETUP
  *****************/
 const initialImg = IS_MOBILE ? HERO_IMAGES.mobile.on : HERO_IMAGES.desktop.on;
@@ -91,7 +99,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (IS_MOBILE) {
-    // ✅ Always mobile layout if detected on load
+    // ✅ Mobile layout fixed
     const scale = (vw / iw) * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
