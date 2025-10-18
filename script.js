@@ -45,26 +45,20 @@ const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
 /*****************
- * MOBILE / DESKTOP DETECTION
+ * MOBILE / DESKTOP DETECTION — once only
  *****************/
-function isPortraitDevice() {
-  // ✅ More reliable on Safari
+function detectMobile() {
   if (window.matchMedia("(orientation: portrait)").matches) return true;
   if (window.innerHeight >= window.innerWidth) return true;
   return false;
 }
-
-function getInitialStationImage() {
-  const isMobile = isPortraitDevice();
-  const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
-  return imgSet.on;
-}
+const IS_MOBILE = detectMobile();
 
 /*****************
  * INITIAL IMAGE SETUP
  *****************/
-const initialImg = getInitialStationImage();
-stationImg.src = initialImg + "?v=" + Date.now(); // cache-buster ONLY on first load
+const initialImg = IS_MOBILE ? HERO_IMAGES.mobile.on : HERO_IMAGES.desktop.on;
+stationImg.src = initialImg + "?v=" + Date.now(); // cache-buster only on first load
 setBg(initialImg);
 
 function setBg(url) {
@@ -87,11 +81,7 @@ const HS_LANDSCAPE = {
 
 function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
 
-function usingPortraitImage() {
-  return stationImg.naturalHeight > stationImg.naturalWidth;
-}
-
-const MOBILE_ZOOM = 1.0; // ✅ Mobile images are already perfectly sized
+const MOBILE_ZOOM = 1.0;
 let HS = null;
 
 window.layout = function layout() {
@@ -100,8 +90,8 @@ window.layout = function layout() {
   const iw = stationImg.naturalWidth || 1152;
   const ih = stationImg.naturalHeight || 768;
 
-  if (usingPortraitImage()) {
-    // ✅ Scale to full width for mobile, no squashing or gaps
+  if (IS_MOBILE) {
+    // ✅ Always mobile layout if detected on load
     const scale = (vw / iw) * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
@@ -117,7 +107,7 @@ window.layout = function layout() {
       links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop layout stays EXACTLY as it was
+    // ✅ Desktop untouched
     const scaleW = vw / iw;
     const scale = scaleW * 0.9;
     const dispW = Math.round(iw * scaleW);
@@ -161,17 +151,12 @@ if (window.visualViewport) {
   visualViewport.addEventListener("resize", layout);
   visualViewport.addEventListener("scroll", layout);
 }
-window.addEventListener("orientationchange", () => {
-  stopFlicker();
-  startFlicker();
-});
 
 /*****************
- * FLICKER EFFECT — restored to original for desktop
+ * FLICKER EFFECT
  *****************/
 function setOff(isOff) {
-  const isMobile = usingPortraitImage();
-  const imgSet = isMobile ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
+  const imgSet = IS_MOBILE ? HERO_IMAGES.mobile : HERO_IMAGES.desktop;
   const nextSrc = isOff ? imgSet.off : imgSet.on;
   stationImg.src = nextSrc;
   setBg(nextSrc);
