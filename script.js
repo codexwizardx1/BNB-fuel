@@ -256,6 +256,29 @@ if (!IS_MOBILE) {
       el.addEventListener("mouseleave", clearHero);
     }
   });
+
+  // ✅ Keep overlay locked while modal is open
+  const modalOverlayMap = {
+    "hs-tokenomics": "tokenomics",
+    "hs-contract": "contract",
+    "hs-links": "links"
+  };
+
+  ["hs-contract", "hs-links", "hs-tokenomics"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", () => {
+        const key = modalOverlayMap[id];
+        if (key) swapHero(key);
+      });
+    }
+  });
+
+  document.querySelectorAll("[data-close]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      clearHero();
+    });
+  });
 }
 
 /*****************
