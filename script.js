@@ -12,20 +12,15 @@ const LINKS = {
 };
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
-/*****************
- * HERO IMAGES
- *****************/
 const HERO_IMAGES = {
   default: "station_on.png",
   off: "station_off.png",
-  mobile_default: "station_mobile_on.png",
-  mobile_off: "station_mobile_off.png",
   tokenomics: "station_hover_tokenomics.png",
   contract: "station_hover_contract.png",
   links: "station_hover_links.png",
 };
 
-Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
+Object.values(HERO_IMAGES).forEach(src => { if (src) new Image().src = src; });
 
 /*****************
  * ELEMENTS
@@ -34,20 +29,17 @@ const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
-if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
-  stationImg.src = HERO_IMAGES.mobile_default;
-} else {
-  stationImg.src = HERO_IMAGES.default;
-}
-
 function setBg(url) {
   document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
 }
 setBg(stationImg.currentSrc || stationImg.src);
-stationImg.addEventListener("load", () => { setBg(stationImg.currentSrc || stationImg.src); layout(); });
+stationImg.addEventListener("load", () => {
+  setBg(stationImg.currentSrc || stationImg.src);
+  layout();
+});
 
 /*****************
- * HOTSPOTS
+ * HOTSPOTS MAP
  *****************/
 const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
@@ -55,19 +47,18 @@ const HS_LANDSCAPE = {
   links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
 };
 
-function hydrate(map) {
-  Object.values(map).forEach((s) => s.el = document.getElementById(s.id) || null);
-}
+function hydrate(map) { Object.values(map).forEach(s => s.el = document.getElementById(s.id) || null); }
 
 function usingPortraitImage() {
-  return window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
+  const src = stationImg.currentSrc || stationImg.src;
+  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_1080x1920/i.test(src);
 }
-
 const MOBILE_ZOOM = 1.3;
+
 let HS = null;
 
 /*****************
- * LAYOUT — height-fit for desktop (your original behavior)
+ * LAYOUT — ORIGINAL
  *****************/
 window.layout = function layout() {
   const vw = window.innerWidth;
@@ -76,7 +67,6 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // ✅ Mobile
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -89,11 +79,11 @@ window.layout = function layout() {
     const remap = (v) => v ? ({ ...v, y: 0.3125 + 0.375 * v.y, h: 0.375 * v.h }) : null;
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
-      contract: remap(HS_LANDSCAPE.contract),
-      links: remap(HS_LANDSCAPE.links),
+      contract:  remap(HS_LANDSCAPE.contract),
+      links:     remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop: Fill height, center horizontally (your original behavior)
+    // ✅ Desktop: original height-fit logic (perfect fill)
     const scaleH = vh / ih;
     const dispH = vh;
     const dispW = Math.round(iw * scaleH);
@@ -114,6 +104,7 @@ window.layout = function layout() {
   const rect = stage.getBoundingClientRect();
   const dispW = rect.width;
   const dispH = rect.height;
+
   Object.values(HS).filter(s => s && s.el).forEach(spec => place(spec, dispW, dispH));
 };
 
@@ -126,8 +117,8 @@ function place(spec, dispW, dispH) {
   Object.assign(spec.el.style, {
     position: "absolute",
     left: x - w / 2 + "px",
-    top: y - h / 2 + "px",
-    width: w + "px",
+    top:  y - h / 2 + "px",
+    width:  w + "px",
     height: h + "px",
     transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`,
     willChange: "transform, left, top, width, height"
@@ -143,16 +134,11 @@ if (window.visualViewport) {
 }
 
 /*****************
- * FLICKER EFFECT
+ * FLICKER
  *****************/
 function setOff(isOff) {
-  if (usingPortraitImage()) {
-    stationImg.src = isOff ? HERO_IMAGES.mobile_off : HERO_IMAGES.mobile_default;
-  } else {
-    stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
-  }
+  stationImg.src = isOff ? HERO_IMAGES.off : HERO_IMAGES.default;
 }
-
 let flickerTimer = null;
 let burstTimer = null;
 
