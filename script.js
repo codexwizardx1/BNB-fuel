@@ -13,7 +13,7 @@ const LINKS = {
 const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
 
 /*****************
- * HERO IMAGES (desktop + mobile)
+ * HERO IMAGES
  *****************/
 const HERO_IMAGES = {
   default: "station_on.png",
@@ -36,6 +36,13 @@ Object.values(HERO_IMAGES).forEach((src) => {
 const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
+
+// ✅ load correct image at start
+if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+  stationImg.src = HERO_IMAGES.mobile_default;
+} else {
+  stationImg.src = HERO_IMAGES.default;
+}
 
 function setBg(url) {
   document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
@@ -62,12 +69,10 @@ function hydrate(map) {
 }
 
 function usingPortraitImage() {
-  const src = stationImg.currentSrc || stationImg.src;
-  return stationImg.naturalHeight > stationImg.naturalWidth || /station_mobile_/i.test(src);
+  return window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
 }
 
 const MOBILE_ZOOM = 1.3;
-
 let HS = null;
 
 window.layout = function layout() {
@@ -108,7 +113,6 @@ window.layout = function layout() {
   const rect = stage.getBoundingClientRect();
   const dispW = rect.width;
   const dispH = rect.height;
-
   Object.values(HS).filter((s)=>s && s.el).forEach((spec) => place(spec, dispW, dispH));
 };
 
@@ -174,7 +178,6 @@ function startFlicker() {
 }
 
 startFlicker();
-
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && !flickerTimer && !burstTimer) startFlicker();
 });
