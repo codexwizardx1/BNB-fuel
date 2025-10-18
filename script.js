@@ -10,7 +10,7 @@ const LINKS = {
   TWITTER: "https://x.com/yourhandle",
   WHITEPAPER: "https://example.com/whitepaper.pdf",
 };
-const TOKENOMICS = { supply: "1,000,000,000 FUEL", tax: "0%", liquidity: "Locked" };
+const TOKENOMICS = { supply: "1,000,000,000 $BIFUEL", tax: "0%", liquidity: "Locked" };
 
 const HERO_IMAGES = {
   desktop: {
@@ -254,6 +254,8 @@ const swapHero = (key) => {
 const clearHero = () => {
   if (!isOverlayLocked) {
     stationOverlay.style.opacity = "0";
+  } else {
+    stationOverlay.style.opacity = "0";
   }
 };
 
@@ -287,10 +289,18 @@ if (!IS_MOBILE) {
     }
   });
 
+  // 🪄 remove lock on click but clear after transition end
   document.querySelectorAll("[data-close]").forEach(btn => {
     btn.addEventListener("click", () => {
       isOverlayLocked = false;
-      clearHero();
+    });
+  });
+
+  document.querySelectorAll(".modal").forEach(modal => {
+    modal.addEventListener("transitionend", () => {
+      if (modal.getAttribute("aria-hidden") === "true") {
+        clearHero();
+      }
     });
   });
 }
