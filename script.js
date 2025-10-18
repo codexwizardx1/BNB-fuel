@@ -34,7 +34,6 @@ const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
-// ✅ set correct initial image
 if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
   stationImg.src = HERO_IMAGES.mobile_default;
 } else {
@@ -74,7 +73,6 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
-    // ✅ Mobile layout
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -91,14 +89,20 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
-    // ✅ Desktop layout — fill full width without zooming in
+    // ✅ Desktop full width, correct aspect ratio, no zoom
     const dispW = vw;
     const aspectRatio = iw / ih;
     const dispH = Math.round(dispW / aspectRatio);
     const offX = 0;
     const offY = Math.floor((vh - dispH) / 2);
 
-    Object.assign(stage.style, { left: offX + 'px', top: offY + 'px', width: dispW + 'px', height: dispH + 'px' });
+    Object.assign(stage.style, {
+      left: offX + 'px',
+      top: offY + 'px',
+      width: dispW + 'px',
+      height: dispH + 'px'
+    });
+
     HS = JSON.parse(JSON.stringify(HS_LANDSCAPE));
   }
 
