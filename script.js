@@ -25,10 +25,7 @@ const HERO_IMAGES = {
   links: "station_hover_links.png",
 };
 
-// Preload all images
-Object.values(HERO_IMAGES).forEach((src) => {
-  if (src) new Image().src = src;
-});
+Object.values(HERO_IMAGES).forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
  * ELEMENTS
@@ -37,7 +34,7 @@ const stage = document.getElementById("stage");
 const stationImg = document.getElementById("station");
 const stationOverlay = document.getElementById("stationOverlay");
 
-// ✅ load correct image at start
+// ✅ set correct initial image
 if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
   stationImg.src = HERO_IMAGES.mobile_default;
 } else {
@@ -48,10 +45,7 @@ function setBg(url) {
   document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
 }
 setBg(stationImg.currentSrc || stationImg.src);
-stationImg.addEventListener("load", () => {
-  setBg(stationImg.currentSrc || stationImg.src);
-  layout();
-});
+stationImg.addEventListener("load", () => { setBg(stationImg.currentSrc || stationImg.src); layout(); });
 
 /*****************
  * HOTSPOTS
@@ -63,9 +57,7 @@ const HS_LANDSCAPE = {
 };
 
 function hydrate(map) {
-  Object.values(map).forEach((s) => {
-    s.el = document.getElementById(s.id) || null;
-  });
+  Object.values(map).forEach((s) => s.el = document.getElementById(s.id) || null);
 }
 
 function usingPortraitImage() {
@@ -94,12 +86,12 @@ window.layout = function layout() {
     const remap = (v) => v ? ({ ...v, y: 0.3125 + 0.375 * v.y, h: 0.375 * v.h }) : null;
     HS = {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
-      contract:  remap(HS_LANDSCAPE.contract),
-      links:     remap(HS_LANDSCAPE.links),
+      contract: remap(HS_LANDSCAPE.contract),
+      links: remap(HS_LANDSCAPE.links),
     };
   } else {
     const scaleW = vw / iw;
-    const scale = scaleW * 0.9;
+    const scale = scaleW * 1;  // ✅ full width restored
     const dispW = Math.round(iw * scaleW);
     const dispH = Math.round(ih * scale);
     const offX = 0;
@@ -113,7 +105,7 @@ window.layout = function layout() {
   const rect = stage.getBoundingClientRect();
   const dispW = rect.width;
   const dispH = rect.height;
-  Object.values(HS).filter((s)=>s && s.el).forEach((spec) => place(spec, dispW, dispH));
+  Object.values(HS).filter(s => s && s.el).forEach(spec => place(spec, dispW, dispH));
 };
 
 function place(spec, dispW, dispH) {
@@ -125,8 +117,8 @@ function place(spec, dispW, dispH) {
   Object.assign(spec.el.style, {
     position: "absolute",
     left: x - w / 2 + "px",
-    top:  y - h / 2 + "px",
-    width:  w + "px",
+    top: y - h / 2 + "px",
+    width: w + "px",
     height: h + "px",
     transform: `skewX(${spec.skew}deg) rotate(${spec.rot}deg)`,
     willChange: "transform, left, top, width, height"
@@ -142,7 +134,7 @@ if (window.visualViewport) {
 }
 
 /*****************
- * FLICKER EFFECT (Desktop + Mobile)
+ * FLICKER EFFECT
  *****************/
 function setOff(isOff) {
   if (usingPortraitImage()) {
