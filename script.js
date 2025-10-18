@@ -74,6 +74,7 @@ window.layout = function layout() {
   const ih = stationImg.naturalHeight || 768;
 
   if (usingPortraitImage()) {
+    // ✅ Mobile layout
     const contain = Math.min(vw / iw, vh / ih);
     const scale = contain * MOBILE_ZOOM;
     const dispW = Math.round(iw * scale);
@@ -90,11 +91,12 @@ window.layout = function layout() {
       links: remap(HS_LANDSCAPE.links),
     };
   } else {
+    // ✅ Desktop layout — restored 0.9 scale so not zoomed in too much
     const scaleW = vw / iw;
-    const scale = scaleW * 1;  // ✅ full width restored
-    const dispW = Math.round(iw * scaleW);
+    const scale = scaleW * 0.9;
+    const dispW = Math.round(iw * scale);
     const dispH = Math.round(ih * scale);
-    const offX = 0;
+    const offX = Math.floor((vw - dispW) / 2);
     const offY = Math.floor((vh - dispH) / 2);
 
     Object.assign(stage.style, { left: offX + 'px', top: offY + 'px', width: dispW + 'px', height: dispH + 'px' });
