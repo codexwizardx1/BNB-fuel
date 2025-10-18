@@ -24,14 +24,10 @@
 
   <div id="root">
     <div class="stage" id="stage">
-      <picture id="stationPicture">
-        <!-- ✅ Replaced old mobile image -->
-        <source srcset="station_mobile_on.png"
-                media="(max-width: 768px) and (orientation: portrait)" />
-        <img id="station" src="station_on.png" alt="BNB Fuel Station" />
-        <img id="stationOverlay" alt="" />
-        <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
-      </picture>
+      <!-- ✅ removed <source> so JS can fully control mobile flicker -->
+      <img id="station" src="station_on.png" alt="BNB Fuel Station" />
+      <img id="stationOverlay" alt="" />
+      <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
 
       <!-- Hotspots -->
       <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
