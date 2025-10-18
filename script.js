@@ -240,21 +240,42 @@ document.querySelectorAll("[data-close]").forEach(el => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY
+ * HOVER IMAGE OVERLAY (disabled on mobile)
  *****************/
+if (!IS_MOBILE) {
+  ["tokenomics", "contract", "links"].forEach((key) => {
+    const el = document.getElementById(`hs-${key}`);
+    if (el && HERO_IMAGES[key]) {
+      el.addEventListener("mouseenter", () => swapHero(key));
+      el.addEventListener("mouseleave", clearHero);
+    }
+  });
+}
+
 const swapHero = (key) => {
   const img = HERO_IMAGES[key];
   if (img) { stationOverlay.src = img; stationOverlay.style.opacity = "1"; }
 };
 const clearHero = () => { stationOverlay.style.opacity = "0"; };
 
-["tokenomics", "contract", "links"].forEach((key) => {
-  const el = document.getElementById(`hs-${key}`);
-  if (el && HERO_IMAGES[key]) {
-    el.addEventListener("mouseenter", () => swapHero(key));
-    el.addEventListener("mouseleave", clearHero);
-  }
-});
+/*****************
+ * FREEZE BG WHEN MODAL OPEN ON MOBILE
+ *****************/
+if (IS_MOBILE) {
+  const modals = document.querySelectorAll(".modal");
+  modals.forEach(modal => {
+    modal.addEventListener("transitionstart", () => {
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+    });
+    modal.addEventListener("transitionend", () => {
+      if (modal.getAttribute("aria-hidden") === "true") {
+        document.body.style.position = "";
+        document.body.style.width = "";
+      }
+    });
+  });
+}
 
 /*****************
  * COPY CONTRACT
