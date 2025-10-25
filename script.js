@@ -348,3 +348,56 @@ if (copyBtn) {
       .catch(() => { alert("Failed to copy address. Please copy manually."); });
   });
 }
+/*****************
+ * DEBUG MODE — Move hotspot with arrow keys
+ *****************/
+let selectedHotspot = "hs-about";  // 👈 which hotspot you want to move
+let step = 0.002;                  // 👈 how much to move each key press
+
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+  const target = Object.values(HS_LANDSCAPE).find(s => s.id === selectedHotspot);
+  if (!target) return;
+
+  let changed = false;
+
+  switch (key) {
+    case "arrowup":
+      target.y -= step;
+      changed = true;
+      break;
+    case "arrowdown":
+      target.y += step;
+      changed = true;
+      break;
+    case "arrowleft":
+      target.x -= step;
+      changed = true;
+      break;
+    case "arrowright":
+      target.x += step;
+      changed = true;
+      break;
+    case "q": // make box wider
+      target.w += step;
+      changed = true;
+      break;
+    case "a": // make box narrower
+      target.w -= step;
+      changed = true;
+      break;
+    case "w": // make box taller
+      target.h += step;
+      changed = true;
+      break;
+    case "s": // make box shorter
+      target.h -= step;
+      changed = true;
+      break;
+  }
+
+  if (changed) {
+    console.log(`x: ${target.x.toFixed(4)}, y: ${target.y.toFixed(4)}, w: ${target.w.toFixed(4)}, h: ${target.h.toFixed(4)}`);
+    layout(); // refresh hotspot position live
+  }
+});
