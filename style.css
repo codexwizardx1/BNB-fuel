@@ -148,3 +148,8 @@ body{
   z-index: 20000;        /* Above rewards + main overlays */
   pointer-events: none;  /* So hotspots still work */
 }
+/* TEMPORARY — to see and position the About hotspot box */
+#hs-about {
+  outline: 2px solid red;      /* makes box visible */
+  background: rgba(255,0,0,0.2); /* light transparent red */
+}
