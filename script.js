@@ -89,7 +89,7 @@ const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
   contract:  { id: "hs-contract",  x: 0.4810, y: 0.6450, w: 0.1020, h: 0.0340, skew: -4, rot: 5.2 },
   links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
-  about:     { id: "hs-about",     x: 0.86,   y: 0.15,  w: 0.08,   h: 0.04,   skew: 0,   rot: 0 } // 🆕 About
+  about:     { id: "hs-about",     x: 0.8220, y: 0.6600, w: 0.0660, h: 0.0360, skew: 0.0, rot: -4.0 } // ✅ Final About values
 };
 
 function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
@@ -121,7 +121,7 @@ window.layout = function layout() {
     };
   } else {
     const scaleW = vw / iw;
-    const scale = scaleW * 0.88; // ✅ Adjusted for correct zoom
+    const scale = scaleW * 0.88; // ✅ zoom level
     const dispW = Math.round(iw * scaleW);
     const dispH = Math.round(ih * scale);
     const offX = 0;
@@ -211,7 +211,7 @@ document.addEventListener("visibilitychange", () => {
 const mContract = document.getElementById("modal-contract");
 const mLinks    = document.getElementById("modal-links");
 const mTok      = document.getElementById("modal-tokenomics");
-const mAbout    = document.getElementById("modal-about"); // 🆕
+const mAbout    = document.getElementById("modal-about");
 
 document.getElementById("tok-supply").textContent = TOKENOMICS.supply;
 document.getElementById("tok-tax").textContent    = TOKENOMICS.tax;
@@ -249,63 +249,7 @@ document.querySelectorAll("[data-close]").forEach(el => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY + LOCKING
- *****************/
-let isOverlayLocked = false;
-
-function showOverlay(key) {
-  const img = HERO_IMAGES[key];
-  if (img) {
-    stationOverlay.src = img;
-    stationOverlay.style.opacity = "1";
-  }
-}
-
-function hideOverlay(force = false) {
-  if (isOverlayLocked && !force) return;
-  stationOverlay.style.opacity = "0";
-}
-
-if (!IS_MOBILE) {
-  // Hover behavior for station overlays
-  ["tokenomics", "contract", "links"].forEach((key) => {
-    const el = document.getElementById(`hs-${key}`);
-    if (!el || !HERO_IMAGES[key]) return;
-
-    el.addEventListener("mouseenter", () => showOverlay(key));
-    el.addEventListener("mouseleave", () => hideOverlay());
-  });
-
-  // Lock overlay on modal open
-  const modalOverlayMap = {
-    "hs-tokenomics": "tokenomics",
-    "hs-contract": "contract",
-    "hs-links": "links",
-  };
-
-  ["hs-contract", "hs-links", "hs-tokenomics"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    el.addEventListener("click", () => {
-      const key = modalOverlayMap[id];
-      if (!key) return;
-      isOverlayLocked = true;
-      showOverlay(key);
-    });
-  });
-
-  // Force clear on modal close
-  document.querySelectorAll("[data-close]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      isOverlayLocked = false;
-      hideOverlay(true);
-    });
-  });
-}
-
-/*****************
- * ABOUT OVERLAY HOVER (INDEPENDENT)
+ * ABOUT OVERLAY HOVER
  *****************/
 const aboutOverlay = document.getElementById("aboutOverlay");
 const aboutHotspot = document.getElementById("hs-about");
@@ -319,41 +263,11 @@ if (!IS_MOBILE && aboutOverlay && aboutHotspot) {
 }
 
 /*****************
- * FREEZE BG WHEN MODAL OPEN ON MOBILE
- *****************/
-if (IS_MOBILE) {
-  const modals = document.querySelectorAll(".modal");
-  modals.forEach(modal => {
-    modal.addEventListener("transitionstart", () => {
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-    });
-    modal.addEventListener("transitionend", () => {
-      if (modal.getAttribute("aria-hidden") === "true") {
-        document.body.style.position = "";
-        document.body.style.width = "";
-      }
-    });
-  });
-}
-
-/*****************
- * COPY CONTRACT
- *****************/
-const copyBtn = document.getElementById("copyContract");
-if (copyBtn) {
-  copyBtn.addEventListener("click", () => {
-    navigator.clipboard.writeText(CONTRACT_ADDRESS)
-      .then(() => { copyBtn.textContent = "Copied!"; setTimeout(() => { copyBtn.textContent = "Copy"; }, 2000); })
-      .catch(() => { alert("Failed to copy address. Please copy manually."); });
-  });
-}
-/*****************
  * DEBUG MODE — Move / Resize / Rotate hotspot with keyboard
  *****************/
-let selectedHotspot = "hs-about";  // 👈 which hotspot you're editing
-let step = 0.002;                  // 👈 position/size step
-let angleStep = 1;                 // 👈 degrees per key press for rotation/skew
+let selectedHotspot = "hs-about";  // 👈 currently editing this one
+let step = 0.002;                  // 👈 movement/scale step
+let angleStep = 1;                 // 👈 rotation/skew step (degrees)
 
 document.addEventListener("keydown", (e) => {
   const key = e.key.toLowerCase();
@@ -363,25 +277,16 @@ document.addEventListener("keydown", (e) => {
   let changed = false;
 
   switch (key) {
-    // ⬆️⬇️⬅️➡️ Move
     case "arrowup":    target.y -= step; changed = true; break;
     case "arrowdown":  target.y += step; changed = true; break;
     case "arrowleft":  target.x -= step; changed = true; break;
     case "arrowright": target.x += step; changed = true; break;
-
-    // Q / A — wider / narrower
     case "q": target.w += step; changed = true; break;
     case "a": target.w -= step; changed = true; break;
-
-    // W / S — taller / shorter
     case "w": target.h += step; changed = true; break;
     case "s": target.h -= step; changed = true; break;
-
-    // E / D — rotate clockwise / counter-clockwise
     case "e": target.rot += angleStep; changed = true; break;
     case "d": target.rot -= angleStep; changed = true; break;
-
-    // R / F — skew right / left
     case "r": target.skew += angleStep; changed = true; break;
     case "f": target.skew -= angleStep; changed = true; break;
   }
@@ -390,6 +295,6 @@ document.addEventListener("keydown", (e) => {
     console.log(
       `x:${target.x.toFixed(4)}, y:${target.y.toFixed(4)}, w:${target.w.toFixed(4)}, h:${target.h.toFixed(4)}, rot:${target.rot.toFixed(1)}, skew:${target.skew.toFixed(1)}`
     );
-    layout(); // refresh hotspot position live
+    layout();
   }
 });
