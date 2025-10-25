@@ -13,23 +13,27 @@
   <link rel="preload" as="image" href="station_on.png" />
   <link rel="preload" as="image" href="station_off.png" />
   <link rel="preload" as="image" href="rewards.png" />
+  <link rel="preload" as="image" href="about-white.png" />
+  <link rel="preload" as="image" href="about-yellow.png" />
 </head>
 
 <body>
- 
   <div id="root">
     <div class="stage" id="stage">
       <picture id="stationPicture">
- <img id="station" alt="BNB Fuel Station" />
-  <img id="stationOverlay" alt="" />
-  <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
-</picture>
-
+        <img id="station" alt="BNB Fuel Station" />
+        <img id="stationOverlay" alt="" />
+        <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
+        <!-- 🟡 About overlay -->
+        <img id="aboutOverlay" src="about-white.png" alt="About Overlay" />
+      </picture>
 
       <!-- Hotspots -->
       <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
       <button class="hotspot" id="hs-contract" aria-label="Show contract address"></button>
       <button class="hotspot" id="hs-links" aria-label="Show links"></button>
+      <!-- 🟡 About Hotspot -->
+      <button class="hotspot" id="hs-about" aria-label="About"></button>
     </div>
   </div>
 
