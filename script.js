@@ -349,10 +349,11 @@ if (copyBtn) {
   });
 }
 /*****************
- * DEBUG MODE — Move hotspot with arrow keys
+ * DEBUG MODE — Move / Resize / Rotate hotspot with keyboard
  *****************/
-let selectedHotspot = "hs-about";  // 👈 which hotspot you want to move
-let step = 0.002;                  // 👈 how much to move each key press
+let selectedHotspot = "hs-about";  // 👈 which hotspot you're editing
+let step = 0.002;                  // 👈 position/size step
+let angleStep = 1;                 // 👈 degrees per key press for rotation/skew
 
 document.addEventListener("keydown", (e) => {
   const key = e.key.toLowerCase();
@@ -362,42 +363,33 @@ document.addEventListener("keydown", (e) => {
   let changed = false;
 
   switch (key) {
-    case "arrowup":
-      target.y -= step;
-      changed = true;
-      break;
-    case "arrowdown":
-      target.y += step;
-      changed = true;
-      break;
-    case "arrowleft":
-      target.x -= step;
-      changed = true;
-      break;
-    case "arrowright":
-      target.x += step;
-      changed = true;
-      break;
-    case "q": // make box wider
-      target.w += step;
-      changed = true;
-      break;
-    case "a": // make box narrower
-      target.w -= step;
-      changed = true;
-      break;
-    case "w": // make box taller
-      target.h += step;
-      changed = true;
-      break;
-    case "s": // make box shorter
-      target.h -= step;
-      changed = true;
-      break;
+    // ⬆️⬇️⬅️➡️ Move
+    case "arrowup":    target.y -= step; changed = true; break;
+    case "arrowdown":  target.y += step; changed = true; break;
+    case "arrowleft":  target.x -= step; changed = true; break;
+    case "arrowright": target.x += step; changed = true; break;
+
+    // Q / A — wider / narrower
+    case "q": target.w += step; changed = true; break;
+    case "a": target.w -= step; changed = true; break;
+
+    // W / S — taller / shorter
+    case "w": target.h += step; changed = true; break;
+    case "s": target.h -= step; changed = true; break;
+
+    // E / D — rotate clockwise / counter-clockwise
+    case "e": target.rot += angleStep; changed = true; break;
+    case "d": target.rot -= angleStep; changed = true; break;
+
+    // R / F — skew right / left
+    case "r": target.skew += angleStep; changed = true; break;
+    case "f": target.skew -= angleStep; changed = true; break;
   }
 
   if (changed) {
-    console.log(`x: ${target.x.toFixed(4)}, y: ${target.y.toFixed(4)}, w: ${target.w.toFixed(4)}, h: ${target.h.toFixed(4)}`);
+    console.log(
+      `x:${target.x.toFixed(4)}, y:${target.y.toFixed(4)}, w:${target.w.toFixed(4)}, h:${target.h.toFixed(4)}, rot:${target.rot.toFixed(1)}, skew:${target.skew.toFixed(1)}`
+    );
     layout(); // refresh hotspot position live
   }
 });
