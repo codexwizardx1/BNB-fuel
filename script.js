@@ -24,6 +24,8 @@ const HERO_IMAGES = {
   tokenomics: "station_hover_tokenomics.png",
   contract: "station_hover_contract.png",
   links: "station_hover_links.png",
+  aboutWhite: "about-white.png",
+  aboutYellow: "about-yellow.png"
 };
 
 // Preload images
@@ -34,7 +36,9 @@ const HERO_IMAGES = {
   HERO_IMAGES.mobile.off,
   HERO_IMAGES.tokenomics,
   HERO_IMAGES.contract,
-  HERO_IMAGES.links
+  HERO_IMAGES.links,
+  HERO_IMAGES.aboutWhite,
+  HERO_IMAGES.aboutYellow
 ].forEach((src) => { if (src) new Image().src = src; });
 
 /*****************
@@ -85,6 +89,7 @@ const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
   contract:  { id: "hs-contract",  x: 0.4810, y: 0.6450, w: 0.1020, h: 0.0340, skew: -4, rot: 5.2 },
   links:     { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
+  about:     { id: "hs-about",     x: 0.86,   y: 0.15,  w: 0.08,   h: 0.04,   skew: 0,   rot: 0 } // 🆕 About
 };
 
 function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
@@ -112,10 +117,11 @@ window.layout = function layout() {
       tokenomics: remap(HS_LANDSCAPE.tokenomics),
       contract:  remap(HS_LANDSCAPE.contract),
       links:     remap(HS_LANDSCAPE.links),
+      about:     remap(HS_LANDSCAPE.about),
     };
   } else {
     const scaleW = vw / iw;
-    const scale = scaleW * 0.9;
+    const scale = scaleW * 0.88; // ✅ Adjusted for correct zoom
     const dispW = Math.round(iw * scaleW);
     const dispH = Math.round(ih * scale);
     const offX = 0;
@@ -205,6 +211,7 @@ document.addEventListener("visibilitychange", () => {
 const mContract = document.getElementById("modal-contract");
 const mLinks    = document.getElementById("modal-links");
 const mTok      = document.getElementById("modal-tokenomics");
+const mAbout    = document.getElementById("modal-about"); // 🆕
 
 document.getElementById("tok-supply").textContent = TOKENOMICS.supply;
 document.getElementById("tok-tax").textContent    = TOKENOMICS.tax;
@@ -222,10 +229,14 @@ const open = (m) => m.setAttribute("aria-hidden", "false");
 const close = (m) => m.setAttribute("aria-hidden", "true");
 const onOpen = (modal) => (e) => { e.stopPropagation(); e.preventDefault(); open(modal); };
 
-["hs-contract", "hs-links", "hs-tokenomics"].forEach((id) => {
+["hs-contract", "hs-links", "hs-tokenomics", "hs-about"].forEach((id) => {
   const el = document.getElementById(id);
   if (el) {
-    const modal = id === "hs-contract" ? mContract : id === "hs-links" ? mLinks : mTok;
+    const modal =
+      id === "hs-contract" ? mContract :
+      id === "hs-links" ? mLinks :
+      id === "hs-about" ? mAbout :
+      mTok;
     el.addEventListener("click", onOpen(modal));
   }
 });
@@ -238,7 +249,7 @@ document.querySelectorAll("[data-close]").forEach(el => {
 });
 
 /*****************
- * HOVER IMAGE OVERLAY + LOCKING (final)
+ * HOVER IMAGE OVERLAY + LOCKING
  *****************/
 let isOverlayLocked = false;
 
@@ -256,7 +267,7 @@ function hideOverlay(force = false) {
 }
 
 if (!IS_MOBILE) {
-  // Hover behavior
+  // Hover behavior for station overlays
   ["tokenomics", "contract", "links"].forEach((key) => {
     const el = document.getElementById(`hs-${key}`);
     if (!el || !HERO_IMAGES[key]) return;
@@ -291,6 +302,20 @@ if (!IS_MOBILE) {
       hideOverlay(true);
     });
   });
+}
+
+/*****************
+ * ABOUT OVERLAY HOVER (INDEPENDENT)
+ *****************/
+const aboutOverlay = document.getElementById("aboutOverlay");
+const aboutHotspot = document.getElementById("hs-about");
+
+if (!IS_MOBILE && aboutOverlay && aboutHotspot) {
+  const setAbout = (hovered) => {
+    aboutOverlay.src = hovered ? HERO_IMAGES.aboutYellow : HERO_IMAGES.aboutWhite;
+  };
+  aboutHotspot.addEventListener("mouseenter", () => setAbout(true));
+  aboutHotspot.addEventListener("mouseleave", () => setAbout(false));
 }
 
 /*****************
