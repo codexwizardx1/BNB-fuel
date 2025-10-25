@@ -156,3 +156,9 @@ body{
   background: transparent;
   outline: none;
 }
+/* 📱 Hide About overlay on mobile only */
+@media (max-width: 768px) {
+  #aboutOverlay {
+    display: none;
+  }
+}
