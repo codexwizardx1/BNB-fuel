@@ -139,3 +139,12 @@ body{
     line-height: 1.2;
   }
 }
+#aboutOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 20000;        /* Above rewards + main overlays */
+  pointer-events: none;  /* So hotspots still work */
+}
