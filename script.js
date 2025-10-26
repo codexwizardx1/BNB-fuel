@@ -10,7 +10,13 @@ const LINKS = {
   TWITTER: "https://x.com/yourhandle",
   WHITEPAPER: "https://example.com/whitepaper.pdf",
 };
-const TOKENOMICS = { supply: "1,000,000,000 $BIFUEL", tax: "0%", liquidity: "Locked" };
+const TOKENOMICS = {
+  supply: "1 Billion",
+  reflect: "2%",
+  burn: "2%",
+  marketing: "1%"
+};
+
 
 const HERO_IMAGES = {
   desktop: {
@@ -213,9 +219,11 @@ const mLinks    = document.getElementById("modal-links");
 const mTok      = document.getElementById("modal-tokenomics");
 const mAbout    = document.getElementById("modal-about");
 
-document.getElementById("tok-supply").textContent = TOKENOMICS.supply;
-document.getElementById("tok-tax").textContent    = TOKENOMICS.tax;
-document.getElementById("tok-liq").textContent    = TOKENOMICS.liquidity;
+document.getElementById("tok-supply").textContent     = TOKENOMICS.supply;
+document.getElementById("tok-reflect").textContent    = TOKENOMICS.reflect;
+document.getElementById("tok-burn").textContent       = TOKENOMICS.burn;
+document.getElementById("tok-marketing").textContent  = TOKENOMICS.marketing;
+
 document.getElementById("contract-value").textContent = CONTRACT_ADDRESS;
 
 document.getElementById("lnk-buy").href       = LINKS.BUY;
