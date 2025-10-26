@@ -11,7 +11,7 @@ const LINKS = {
   WHITEPAPER: "https://example.com/whitepaper.pdf",
 };
 const TOKENOMICS = {
-  supply: "1 Billion",
+  supply: "1,000,000,000",
   reflect: "2%",
   burn: "2%",
   marketing: "1%"
