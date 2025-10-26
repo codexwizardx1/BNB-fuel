@@ -89,7 +89,7 @@ const HS_LANDSCAPE = {
   tokenomics: { id: "hs-tokenomics", x: 0.2000, y: 0.6470, w: 0.0960, h: 0.0360, skew: -7, rot: -7 },
   contract:   { id: "hs-contract",  x: 0.4810, y: 0.6450, w: 0.1020, h: 0.0340, skew: -4, rot: 5.2 },
   links:      { id: "hs-links",     x: 0.6610, y: 0.6710, w: 0.0480, h: 0.0290, skew: -5, rot: 2.2 },
-  about:      { id: "hs-about",     x: 0.8220, y: 0.6600, w: 0.0660, h: 0.0360, skew: 0.0, rot: -4.0 } // ✅ Your perfect position
+  about:      { id: "hs-about",     x: 0.8220, y: 0.6600, w: 0.0660, h: 0.0360, skew: 0.0, rot: -4.0 }
 };
 
 function hydrate(map) { Object.values(map).forEach((s) => { s.el = document.getElementById(s.id) || null; }); }
@@ -316,7 +316,7 @@ if (!IS_MOBILE && aboutOverlay && aboutHotspot) {
 /*****************
  * DEBUG MODE — Move / Resize / Rotate hotspot with keyboard
  *****************/
-let selectedHotspot = "hs-about";  // 👈 currently editing this one
+let selectedHotspot = "hs-about";  // currently editing this one
 let step = 0.002;
 let angleStep = 1;
 
@@ -349,3 +349,23 @@ document.addEventListener("keydown", (e) => {
     layout();
   }
 });
+
+/*****************
+ * COPY CONTRACT
+ *****************/
+const copyBtn = document.getElementById("copyContract");
+const contractValue = document.getElementById("contract-value");
+
+if (copyBtn && contractValue) {
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(contractValue.textContent.trim());
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => (copyBtn.textContent = "Copy"), 2000);
+    } catch (err) {
+      console.error("Copy failed:", err);
+      copyBtn.textContent = "Failed 😕";
+      setTimeout(() => (copyBtn.textContent = "Copy"), 2000);
+    }
+  });
+}
