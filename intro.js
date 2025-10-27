@@ -6,6 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const START_DELAY = 500;
   const STEP_TIME = FILL_DURATION / 100;
 
+  // Start filling after a short delay
   setTimeout(() => {
     tank.classList.add('filling');
   }, START_DELAY);
@@ -17,8 +18,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (percent >= 100) {
       clearInterval(interval);
       text.textContent = 'FULL';
+
+      // Instead of redirecting to main.html, trigger the event:
       setTimeout(() => {
-        window.location.href = 'main.html';
+        document.dispatchEvent(new Event('introComplete'));
       }, 800);
     }
   }, STEP_TIME);
