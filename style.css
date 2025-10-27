@@ -162,3 +162,19 @@ body{
     display: none;
   }
 }
+/* Ensure spacing inside modals */
+.modal-card p { 
+  margin: 1rem 0; 
+  line-height: 1.5;
+}
+
+.modal-card p:first-child { margin-top: 0; }
+.modal-card p:last-child { margin-bottom: 0; }
+
+.modal-card ul { 
+  margin: 0.75rem 0 0.75rem 1.25rem; 
+}
+
+.modal-card li { 
+  margin: 0.25rem 0; 
+}
