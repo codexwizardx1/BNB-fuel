@@ -3,11 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BNB Fuel Intro</title>
+  <title>BNB Fuel</title>
+
+  <!-- Intro CSS -->
   <link rel="stylesheet" href="intro.css" />
+  <!-- Main Site CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Preload images -->
+  <link rel="preload" as="image" href="station_hover_tokenomics.png">
+  <link rel="preload" as="image" href="station_hover_contract.png">
+  <link rel="preload" as="image" href="station_hover_links.png">
+  <link rel="preload" as="image" href="station_on.png" />
+  <link rel="preload" as="image" href="station_off.png" />
+  <link rel="preload" as="image" href="rewards.png" />
+  <link rel="preload" as="image" href="about-white.png" />
+  <link rel="preload" as="image" href="about-yellow.png" />
 </head>
+
 <body>
-  <div class="intro-container">
+
+  <!-- INTRO SECTION -->
+  <div class="intro-container" id="intro">
     <div class="can-wrapper">
       <!-- Wave container -->
       <div class="tank">
@@ -16,10 +33,113 @@
       <!-- Jerry can image as top layer -->
       <img src="jerrycan.png" alt="Jerry Can" class="can-outline" />
     </div>
-
     <div id="fuelText" class="label">0%</div>
   </div>
 
+  <!-- MAIN SITE SECTION (HIDDEN INITIALLY) -->
+  <div id="main-content" style="display: none;">
+    <div id="root">
+      <div class="stage" id="stage">
+        <picture id="stationPicture">
+          <img id="station" alt="BNB Fuel Station" />
+          <img id="stationOverlay" alt="" />
+          <img id="rewardsOverlay" src="rewards.png" alt="Rewards Overlay" />
+          <img id="aboutOverlay" src="about-white.png" alt="About Overlay" />
+        </picture>
+
+        <!-- Hotspots -->
+        <button class="hotspot" id="hs-tokenomics" aria-label="Show tokenomics"></button>
+        <button class="hotspot" id="hs-contract" aria-label="Show contract address"></button>
+        <button class="hotspot" id="hs-links" aria-label="Show links"></button>
+        <button class="hotspot" id="hs-about" aria-label="About"></button>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="modal-contract" aria-hidden="true">
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contract-title">
+        <h2 id="contract-title">Contract Address</h2>
+        <code id="contract-value">0x...</code>
+        <div class="modal-actions">
+          <button id="copyContract">Copy</button>
+          <button data-close>Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal-links" aria-hidden="true">
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="links-title">
+        <h2 id="links-title">Official Links</h2>
+        <div class="links-grid">
+          <a id="lnk-buy" class="link-btn" target="_blank" rel="noopener">Buy</a>
+          <a id="lnk-chart" class="link-btn" target="_blank" rel="noopener">Chart</a>
+          <a id="lnk-dextools" class="link-btn" target="_blank" rel="noopener">DEXTools</a>
+          <a id="lnk-telegram" class="link-btn" target="_blank" rel="noopener">Telegram</a>
+          <a id="lnk-twitter" class="link-btn" target="_blank" rel="noopener">X / Twitter</a>
+          <a id="lnk-whitepaper" class="link-btn" target="_blank" rel="noopener">Whitepaper</a>
+        </div>
+        <div class="modal-actions">
+          <button data-close>Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal-tokenomics" aria-hidden="true">
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="toks-title">
+        <h2 id="toks-title">Tokenomics</h2>
+        <table class="tok-table">
+          <tbody>
+            <tr><th>Supply</th><td id="tok-supply"></td></tr>
+            <tr><th>Reflections in BNB</th><td id="tok-reflect"></td></tr>
+            <tr><th>True Burn</th><td id="tok-burn"></td></tr>
+            <tr><th>Marketing</th><td id="tok-marketing"></td></tr>
+          </tbody>
+        </table>
+        <div class="modal-actions">
+          <button data-close>Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal-about" aria-hidden="true">
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <p><strong>BINANCE FUEL – Fuelling A New Generation Of Binance Rewards.</strong></p>
+        <p>
+          Bi-Fuel is an engine capable of running on two power sources — and now that same innovation fuels a revolution in crypto.
+        </p>
+        <p>
+          <strong>$BiFuel</strong> is designed to operate with a dual reward engine:
+        </p>
+        <ul>
+          <li><strong>Automatic BNB Reflections</strong> — every transaction powers instant, passive BNB rewards directly to all holders.</li>
+          <li><strong>Automatic $BiFuel Burns</strong> — a portion of every transaction is sent straight to the flames, permanently reducing supply and increasing token scarcity and value over time.</li>
+        </ul>
+        <p>$BiFuel — A Binance Reward Ecosystem to <strong>FUEL YOUR WALLET</strong>.</p>
+        <div class="modal-actions">
+          <button data-close>Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="intro.js"></script>
+  <script>
+    // When intro finishes, hide it and show the main content
+    document.addEventListener('introComplete', () => {
+      const intro = document.getElementById('intro');
+      intro.style.opacity = '0';
+      setTimeout(() => {
+        intro.style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+      }, 600);
+    });
+  </script>
+  <script src="script.js"></script>
 </body>
 </html>
