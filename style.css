@@ -93,8 +93,14 @@ body{
 .modal-actions button[data-close]{ background:#1c1c1c; color:#eee; border:1px solid #2a2a2a; }
 
 /* Links grid */
-.links-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:6px; }
-.link-btn{ display:block; text-align:center; text-decoration:none; border-radius:10px; padding:12px 10px; background:var(--bnb-yellow); color:#000; font-weight:800; letter-spacing:.04em; }
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* ✅ 2 columns */
+  gap: 10px;
+  margin-top: 6px;
+  justify-items: center; /* centers content nicely */
+}
+
 
 /* Tokenomics table */
 .tok-table{ width:100%; border-collapse:separate; border-spacing:0 8px; margin-top:6px; }
@@ -115,29 +121,7 @@ body{
   outline:2px solid var(--bnb-yellow); outline-offset:2px; border-radius:8px;
 }
 
-/* ✅ Fix link buttons on mobile */
-@media (max-width: 768px) {
-  .link-btn {
-    font-size: 0.85rem;
-    padding: 0.6em 0.8em;
-    white-space: normal;
-    text-align: center;
-    line-height: 1.2;
-  }
-}
 
-/* ✅ Mobile button alignment fix */
-@media (max-width: 768px) {
-  .link-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    padding: 0.6em 0.8em;
-    white-space: normal;
-    text-align: center;
-    line-height: 1.2;
-  }
 }
 
 /* About overlay — above everything but non-blocking */
@@ -161,7 +145,7 @@ body{
   #aboutOverlay {
     display: none;
   }
-}
+
 /* Ensure spacing inside modals */
 .modal-card p { 
   margin: 1rem 0; 
@@ -174,7 +158,37 @@ body{
 .modal-card ul { 
   margin: 0.75rem 0 0.75rem 1.25rem; 
 }
+.link-btn {
+  display: block;
+  width: 100%; /* ✅ ensures all buttons have equal width */
+  text-align: center;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 12px 10px;
+  background: var(--bnb-yellow);
+  color: #000;
+  font-weight: 800;
+  letter-spacing: .04em;
+  transition: background 0.2s ease;
+}
+
+.link-btn:hover {
+  background: #e0aa1e; /* 🔸 slight hover effect */
+}
 
 .modal-card li { 
   margin: 0.25rem 0; 
+}
+/* ✅ Mobile button alignment + sizing */
+@media (max-width: 768px) {
+  .link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    padding: 0.6em 0.8em;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
 }
