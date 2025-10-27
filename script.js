@@ -6,7 +6,7 @@ const LINKS = {
   DEXSCREENER: "https://dexscreener.com/",
   DEXTOOLS: "https://www.dextools.io",
   TELEGRAM: "https://t.me/yourchannel",
-  TWITTER: "https://x.com/yourhandle",
+  TWITTER: "https://x.com/bifuelbnb",
 };
 
 const TOKENOMICS = {
