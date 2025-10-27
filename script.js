@@ -3,13 +3,12 @@
  *****************/
 const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
 const LINKS = {
-  BUY: "https://example.com/buy",
-  CHART: "https://example.com/chart",
+  DEXSCREENER: "https://dexscreener.com/",
   DEXTOOLS: "https://www.dextools.io",
   TELEGRAM: "https://t.me/yourchannel",
   TWITTER: "https://x.com/yourhandle",
-  WHITEPAPER: "https://example.com/whitepaper.pdf",
 };
+
 const TOKENOMICS = {
   supply: "1,000,000,000",
   reflect: "2%",
@@ -226,12 +225,12 @@ document.getElementById("tok-marketing").textContent  = TOKENOMICS.marketing;
 
 document.getElementById("contract-value").textContent = CONTRACT_ADDRESS;
 
-document.getElementById("lnk-buy").href       = LINKS.BUY;
-document.getElementById("lnk-chart").href     = LINKS.CHART;
+
+document.getElementById("lnk-dexscreener").href = LINKS.DEXSCREENER;
 document.getElementById("lnk-dextools").href  = LINKS.DEXTOOLS;
 document.getElementById("lnk-telegram").href  = LINKS.TELEGRAM;
 document.getElementById("lnk-twitter").href   = LINKS.TWITTER;
-document.getElementById("lnk-whitepaper").href= LINKS.WHITEPAPER;
+
 
 const open = (m) => m.setAttribute("aria-hidden", "false");
 const close = (m) => m.setAttribute("aria-hidden", "true");
