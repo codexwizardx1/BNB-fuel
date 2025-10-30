@@ -3,8 +3,8 @@
  *****************/
 const CONTRACT_ADDRESS = "0xdFb2678455d96f59ebCa62f9f9532f587EC9cB2a";
 const LINKS = {
-  DEXSCREENER: "https://dexscreener.com/",
-  DEXTOOLS: "https://www.dextools.io",
+  DEXSCREENER: "https://dexscreener.com/bsc/0x737cd9d7b991f15568c7b9c15dc3a69c649242b8",
+  DEXTOOLS: "https://www.dextools.io/app/en/bnb/pair-explorer/0x737cd9d7b991f15568c7b9c15dc3a69c649242b8?t=1761828876986",
   TELEGRAM: "https://t.me/BiFuel",
   TWITTER: "https://x.com/bifuelbnb",
 };
